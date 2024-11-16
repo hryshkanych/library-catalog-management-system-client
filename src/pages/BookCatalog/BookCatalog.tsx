@@ -1,50 +1,60 @@
-import React from 'react';
-import {AppBar, Toolbar, Box, IconButton, Avatar, Typography, InputAdornment} from '@mui/material';
-import {Notifications, Search} from '@mui/icons-material';
-import { StyledTabs, StyledTab } from 'src/mui-styled-components/styledTabs';
-import { StyledSearchBox } from 'src/mui-styled-components/styledSearch';
-import {useTheme} from '@mui/material/styles';
+import React, {useState} from 'react';
+import Header from 'src/components/Header/Header';
+import SideBar from 'src/components/Sidebar/Sidebar';
+import BookDashboard from 'src/components/BookDashboard/BookDashboard';
+import {IGenres, IAvailability, ILanguages} from 'src/interfaces/filterEntities.interface';
 
 const BookCatalog: React.FC = () => {
-    const theme = useTheme();
+  const [isFiltersVisible, setFiltersVisible] = useState<boolean>(true);
+
+  const [availability, setAvailability] = useState<IAvailability>({available: false, rented: false});
+  const [languages, setLanguages] = useState<ILanguages>({english: false, spanish: false, french: false});
+  const [genres, setGenres] = useState<IGenres>({
+    fiction: false,
+    nonFiction: false,
+    mystery: false,
+    fantasy: false,
+    romance: false
+  });
+
+  const toggleFilters = (): void => {
+    setFiltersVisible(!isFiltersVisible);
+  };
+
+  const handleAvailabilityChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setAvailability({...availability, [e.target.name]: e.target.checked});
+  };
+
+  const handleLanguagesChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setLanguages({...languages, [e.target.name]: e.target.checked});
+  };
+
+  const handleGenresChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setGenres({...genres, [e.target.name]: e.target.checked});
+  };
+
+  const books = [...Array(10)].map((_, index) => ({
+    title: `Book Title ${index + 1}`,
+    author: 'Author Name',
+    available: index % 2 === 0
+  }));
 
   return (
-    <div className="flex flex-col flex-1 overflow-y-auto">
-      <AppBar position="static" color="transparent" elevation={0} sx={{ boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.25)' }}>
-        <Toolbar className="flex justify-between items-center py-4">
-          <Box className="flex">
-            <StyledTabs value={0}>
-              <StyledTab label="Library" />
-              <StyledTab label="Authors" />
-              <StyledTab label="Activity" />
-            </StyledTabs>
-          </Box>
-            <StyledSearchBox
-              variant="outlined"
-              size="small"
-              placeholder="Search..."
-              fullWidth
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          <Box className="flex items-center">
-            <IconButton color="inherit">
-              <Notifications />
-            </IconButton>
-            <Box className="flex items-center ml-4">
-              <Typography variant="body1" sx={{ color: theme.palette.secondary.light}}>John Doe</Typography>
-              <Avatar className="ml-4" alt="Profile" src="/avatar.png" sx={{ width: 62, height: 62 }} />
-            </Box>
-          </Box>
-        </Toolbar>
-      </AppBar>
-      <main className="flex flex-col flex-grow p-4">
-        <h2>Content goes here</h2>
+    <div className="flex flex-col flex-1">
+      <header>
+        <Header toggleFilters={toggleFilters} />
+      </header>
+      <main className="flex flex-grow">
+        <SideBar
+          isVisible={isFiltersVisible}
+          availability={availability}
+          languages={languages}
+          genres={genres}
+          handleAvailabilityChange={handleAvailabilityChange}
+          handleLanguagesChange={handleLanguagesChange}
+          handleGenresChange={handleGenresChange}
+        />
+        <BookDashboard books={books} />
       </main>
       <footer></footer>
     </div>
