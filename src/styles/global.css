@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-line-height: 1.5;
+  --font-weight: 400;
+  --logo-font-size: 1.75rem;
+  --under-main-font-size: 1rem;
+
+  --font-smoothing: antialiased;
+  --text-rendering: optimizeLegibility;
+}
+
+body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  line-height: var(--font-line-height);
+  font-weight: var(--font-weight);
+
+  -webkit-font-smoothing: var(--font-smoothing);
+  -moz-osx-font-smoothing: var(--font-smoothing);
+  text-rendering: var(--text-rendering);
+}
