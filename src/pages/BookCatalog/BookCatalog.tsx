@@ -12,10 +12,12 @@ const BookCatalog: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
-    availability: {available: false, rented: false},
+    availability: {available: false, rented: false, favorite: false},
     languages: {english: false, spanish: false, french: false},
-    genres: {}
+    genres: {},
   });
+
+  const [likedBooks, setLikedBooks] = useState<number[]>([]);
 
   const toggleFilters = (): void => {
     setFiltersVisible(!isFiltersVisible);
@@ -35,7 +37,8 @@ const BookCatalog: React.FC = () => {
     return books.filter((book) => {
       const matchesAvailability =
         (!filters.availability.available || book.copiesAvailable > 0) &&
-        (!filters.availability.rented || book.copiesAvailable < 1);
+        (!filters.availability.rented || book.copiesAvailable < 1) &&
+        (!filters.availability.favorite || likedBooks.includes(book.id));
 
       // const matchesLanguages =
       //   Object.entries(filters.languages).some(
@@ -56,6 +59,11 @@ const BookCatalog: React.FC = () => {
       return matchesAvailability && matchesLanguages && matchesGenres && matchesSearch;
     });
   }, [books, filters, searchQuery]);
+
+  useEffect(() => {
+    const savedLikes = JSON.parse(localStorage.getItem('likedBooks') || '[]');
+    setLikedBooks(savedLikes);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {

@@ -1,12 +1,12 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, CardContent, Typography, IconButton} from '@mui/material';
-import {Favorite} from '@mui/icons-material';
+import {Favorite, FavoriteBorder} from '@mui/icons-material';
 import {StyledGridBox} from 'src/mui-styled-components/styledGridBox';
 import {StyledCard} from 'src/mui-styled-components/styledCard';
 import {StyledMarkedBox} from 'src/mui-styled-components/styledMarkedBox';
 import {useTheme} from '@mui/material/styles';
 import {StyledMainContentBox} from 'src/mui-styled-components/styledMainContentBox';
-import { Book } from 'src/models/book.type';
+import {Book} from 'src/models/book.type';
 
 interface BookDashboardProps {
   books: Book[];
@@ -14,6 +14,25 @@ interface BookDashboardProps {
 
 const BookDashboard: React.FC<BookDashboardProps> = ({books}) => {
   const theme = useTheme();
+  const [likedBooks, setLikedBooks] = useState<number[]>([]);
+
+  useEffect(() => {
+    const savedLikes = JSON.parse(localStorage.getItem('likedBooks') || '[]');
+    setLikedBooks(savedLikes);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('likedBooks', JSON.stringify(likedBooks));
+  }, [likedBooks]);
+
+  const handleLikeToggle = (bookId: number) => {
+    setLikedBooks(
+      (prevLikedBooks) =>
+        prevLikedBooks.includes(bookId)
+          ? prevLikedBooks.filter((id) => id !== bookId)
+          : [...prevLikedBooks, bookId]
+    );
+  };
 
   return (
     <StyledMainContentBox>
@@ -45,8 +64,8 @@ const BookDashboard: React.FC<BookDashboardProps> = ({books}) => {
                 <Typography variant="body2" sx={{color: theme.palette.primary.contrastText, cursor: 'pointer'}}>
                   View
                 </Typography>
-                <IconButton sx={{marginLeft: '0.5rem', color: theme.palette.secondary.main}}>
-                  <Favorite />
+                <IconButton sx={{marginLeft: '0.5rem', color: theme.palette.secondary.main}} onClick={() => handleLikeToggle(book.id)}>
+                  {likedBooks.includes(book.id) ? <Favorite /> : <FavoriteBorder />}
                 </IconButton>
               </Box>
             </CardContent>
