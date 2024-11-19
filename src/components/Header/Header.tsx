@@ -9,10 +9,15 @@ import {StyledToolbar} from 'src/mui-styled-components/styledToolBar';
 
 interface HeaderProps {
   toggleFilters: () => void;
+  onSearch: (query: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({toggleFilters}) => {
+const Header: React.FC<HeaderProps> = ({toggleFilters, onSearch}) => {
   const theme = useTheme();
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onSearch(event.target.value);
+  };
 
   return (
     <StyledAppBar position="static">
@@ -32,6 +37,7 @@ const Header: React.FC<HeaderProps> = ({toggleFilters}) => {
           size="small"
           placeholder="Search..."
           fullWidth
+          onChange={handleSearchChange}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

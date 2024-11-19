@@ -6,9 +6,10 @@ import {StyledCard} from 'src/mui-styled-components/styledCard';
 import {StyledMarkedBox} from 'src/mui-styled-components/styledMarkedBox';
 import {useTheme} from '@mui/material/styles';
 import {StyledMainContentBox} from 'src/mui-styled-components/styledMainContentBox';
+import { Book } from 'src/models/book.type';
 
 interface BookDashboardProps {
-  books: {title: string; author: string; available: boolean}[];
+  books: Book[];
 }
 
 const BookDashboard: React.FC<BookDashboardProps> = ({books}) => {
@@ -38,7 +39,7 @@ const BookDashboard: React.FC<BookDashboardProps> = ({books}) => {
               <Box sx={{display: 'flex', alignItems: 'center'}}>
                 <StyledMarkedBox>
                   <Typography variant="body2" sx={{color: theme.palette.secondary.contrastText}}>
-                    {book.available ? 'Available' : 'Rented'}
+                    {book.copiesAvailable > 0 ? 'Available' : 'Rented'}
                   </Typography>
                 </StyledMarkedBox>
                 <Typography variant="body2" sx={{color: theme.palette.primary.contrastText, cursor: 'pointer'}}>
