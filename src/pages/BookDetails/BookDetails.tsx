@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Typography, Grid, Button} from '@mui/material';
+import {Box, Typography, Grid} from '@mui/material';
 import {StyledButton} from 'src/mui-styled-components/styledButton';
 import {StyledDataMarker} from 'src/mui-styled-components/styledDataMarker';
 import {useTheme} from '@mui/material/styles';

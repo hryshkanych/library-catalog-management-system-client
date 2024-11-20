@@ -6,7 +6,6 @@ import {StyledSearchBox} from 'src/mui-styled-components/styledSearch';
 import {useTheme} from '@mui/material/styles';
 import {StyledAppBar} from 'src/mui-styled-components/styledAppBar';
 import {StyledToolbar} from 'src/mui-styled-components/styledToolBar';
-import {StyledMarkedBox} from 'src/mui-styled-components/styledMarkedBox';
 
 interface HeaderProps {
   toggleFilters: () => void;
