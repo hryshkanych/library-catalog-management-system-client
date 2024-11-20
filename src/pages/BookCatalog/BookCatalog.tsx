@@ -1,23 +1,25 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
 import Header from 'src/components/Header/Header';
 import SideBar from 'src/components/Sidebar/Sidebar';
 import BookDashboard from 'src/components/BookDashboard/BookDashboard';
+import BookDetails from '../BookDetails/BookDetails';
 import {Book} from 'src/models/book.type';
 import {getBooks, getGenres} from 'src/services/book.service';
 import {FilterCategory, Filters} from 'src/types/filterEntities.type';
 
 const BookCatalog: React.FC = () => {
   const [isFiltersVisible, setFiltersVisible] = useState<boolean>(true);
-
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     availability: {available: false, rented: false, favorite: false},
     languages: {english: false, spanish: false, french: false},
-    genres: {},
+    genres: {}
   });
-
   const [likedBooks, setLikedBooks] = useState<number[]>([]);
+
+  const location = useLocation(); // Отримує поточний шлях
 
   const toggleFilters = (): void => {
     setFiltersVisible(!isFiltersVisible);
@@ -40,23 +42,15 @@ const BookCatalog: React.FC = () => {
         (!filters.availability.rented || book.copiesAvailable < 1) &&
         (!filters.availability.favorite || likedBooks.includes(book.id));
 
-      // const matchesLanguages =
-      //   Object.entries(filters.languages).some(
-      //     ([language, isChecked]) => isChecked && book.languages.includes(language)
-      //   );
-
-      const matchesLanguages = true;
-
       const matchesGenres = Object.entries(filters.genres).some(([_, isChecked]) => isChecked)
         ? Object.entries(filters.genres).some(([genre, isChecked]) => isChecked && book.genre === genre)
         : true;
 
       const matchesSearch = searchQuery
-        ? book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          book.author.toLowerCase().includes(searchQuery.toLowerCase())
+        ? book.title.toLowerCase().includes(searchQuery.toLowerCase()) || book.author.toLowerCase().includes(searchQuery.toLowerCase())
         : true;
 
-      return matchesAvailability && matchesLanguages && matchesGenres && matchesSearch;
+      return matchesAvailability && matchesGenres && matchesSearch;
     });
   }, [books, filters, searchQuery]);
 
@@ -86,18 +80,31 @@ const BookCatalog: React.FC = () => {
     fetchData();
   }, []);
 
+  const isBookPage = location.pathname === '/';
+
   return (
     <div className="flex flex-col flex-1">
       <header>
-        <Header toggleFilters={toggleFilters} onSearch={setSearchQuery}/>
+        <Header toggleFilters={toggleFilters} onSearch={setSearchQuery} />
       </header>
       <main className="flex flex-grow">
-        <SideBar isVisible={isFiltersVisible} filters={filters} handleFilterChange={handleFilterChange} />
-        <BookDashboard books={filteredBooks} />
+        {isBookPage && <SideBar isVisible={isFiltersVisible} filters={filters} handleFilterChange={handleFilterChange} />}
+        <div className="flex-grow">
+          <Routes>
+            <Route path="/" element={<BookDashboard books={filteredBooks} />} />
+            <Route path="/book/:id" element={<BookDetails />} />
+          </Routes>
+        </div>
       </main>
       <footer></footer>
     </div>
   );
 };
 
-export default BookCatalog;
+const App: React.FC = () => (
+  <Router>
+    <BookCatalog />
+  </Router>
+);
+
+export default App;

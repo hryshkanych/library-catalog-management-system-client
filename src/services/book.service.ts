@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Book } from 'src/models/book.type';
+import {Book} from 'src/models/book.type';
 
 const API_URL = 'https://localhost:7239/books';
 
@@ -22,4 +22,3 @@ export const getGenres = async (): Promise<string[]> => {
     throw new Error('Failed to fetch books');
   }
 };
-
