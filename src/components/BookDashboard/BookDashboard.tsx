@@ -6,6 +6,7 @@ import {StyledCard} from 'src/mui-styled-components/styledCard';
 import {StyledMarkedBox} from 'src/mui-styled-components/styledMarkedBox';
 import {useTheme} from '@mui/material/styles';
 import {StyledMainContentBox} from 'src/mui-styled-components/styledMainContentBox';
+import {useNavigate} from 'react-router-dom';
 import {Book} from 'src/models/book.type';
 
 interface BookDashboardProps {
@@ -14,6 +15,7 @@ interface BookDashboardProps {
 
 const BookDashboard: React.FC<BookDashboardProps> = ({books}) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [likedBooks, setLikedBooks] = useState<number[]>([]);
 
   useEffect(() => {
@@ -26,12 +28,7 @@ const BookDashboard: React.FC<BookDashboardProps> = ({books}) => {
   }, [likedBooks]);
 
   const handleLikeToggle = (bookId: number) => {
-    setLikedBooks(
-      (prevLikedBooks) =>
-        prevLikedBooks.includes(bookId)
-          ? prevLikedBooks.filter((id) => id !== bookId)
-          : [...prevLikedBooks, bookId]
-    );
+    setLikedBooks((prevLikedBooks) => (prevLikedBooks.includes(bookId) ? prevLikedBooks.filter((id) => id !== bookId) : [...prevLikedBooks, bookId]));
   };
 
   return (
@@ -61,7 +58,11 @@ const BookDashboard: React.FC<BookDashboardProps> = ({books}) => {
                     {book.copiesAvailable > 0 ? 'Available' : 'Rented'}
                   </Typography>
                 </StyledMarkedBox>
-                <Typography variant="body2" sx={{color: theme.palette.primary.contrastText, cursor: 'pointer'}}>
+                <Typography
+                  variant="body2"
+                  sx={{color: theme.palette.primary.contrastText, cursor: 'pointer'}}
+                  onClick={() => navigate(`/book/${book.id}`)}
+                >
                   View
                 </Typography>
                 <IconButton sx={{marginLeft: '0.5rem', color: theme.palette.secondary.main}} onClick={() => handleLikeToggle(book.id)}>

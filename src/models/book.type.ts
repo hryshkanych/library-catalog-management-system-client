@@ -6,4 +6,4 @@ export type Book = {
   isbn: string;
   copiesAvailable: number;
   genre: string;
-}
+};
