@@ -28,7 +28,7 @@ const App: React.FC = () => {
             <Route path="/login" element={<Login />} />
 
             <Route
-              path="/"
+              path="*"
               element={
                 <ProtectedRoute>
                   <div className="flex w-screen h-screen" style={{ backgroundColor: theme.palette.primary.dark }}>

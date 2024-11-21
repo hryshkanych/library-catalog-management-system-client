@@ -16,7 +16,6 @@ const Login: React.FC = () => {
       setTimeout(() => {
         navigate('/');
       }, 0);
-      console.log('redirecting');
     } catch {
       setError('Invalid credentials.');
     }
