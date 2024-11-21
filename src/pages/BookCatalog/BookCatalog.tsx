@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
+import {Routes, Route, useLocation} from 'react-router-dom';
 import Header from 'src/components/Header/Header';
 import SideBar from 'src/components/Sidebar/Sidebar';
 import BookDashboard from 'src/components/BookDashboard/BookDashboard';
@@ -19,7 +19,7 @@ const BookCatalog: React.FC = () => {
   });
   const [likedBooks, setLikedBooks] = useState<number[]>([]);
 
-  const location = useLocation(); // Отримує поточний шлях
+  const location = useLocation();
 
   const toggleFilters = (): void => {
     setFiltersVisible(!isFiltersVisible);
@@ -80,15 +80,15 @@ const BookCatalog: React.FC = () => {
     fetchData();
   }, []);
 
-  const isBookPage = location.pathname === '/';
-
   return (
     <div className="flex flex-col flex-1">
       <header>
         <Header toggleFilters={toggleFilters} onSearch={setSearchQuery} />
       </header>
       <main className="flex flex-grow">
-        {isBookPage && <SideBar isVisible={isFiltersVisible} filters={filters} handleFilterChange={handleFilterChange} />}
+        {location.pathname === '/' && (
+          <SideBar isVisible={isFiltersVisible} filters={filters} handleFilterChange={handleFilterChange} />
+        )}
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<BookDashboard books={filteredBooks} />} />
@@ -101,10 +101,4 @@ const BookCatalog: React.FC = () => {
   );
 };
 
-const App: React.FC = () => (
-  <Router>
-    <BookCatalog />
-  </Router>
-);
-
-export default App;
+export default BookCatalog;
