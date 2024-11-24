@@ -1,3 +1,6 @@
+import { Book } from "./book.type";
+import { User } from "./user.type";
+
 export type Reservation = {
   id: number;
   userId: number;
@@ -5,4 +8,6 @@ export type Reservation = {
   reservationDate: Date;
   expirationDate: Date;
   isActive: boolean;
+  user?: User;
+  book?: Book;
 }

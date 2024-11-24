@@ -3,6 +3,16 @@ import {Reservation} from 'src/models/reservation.type';
 
 const API_URL = 'https://localhost:7239/reservations';
 
+export const getReservations = async (): Promise<Reservation[]> => {
+  try {
+    const response = await axios.get(API_URL);
+    return response.data;
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw error;
+  }
+};
+
 export const getReservationsByUserId = async (userId: number): Promise<Reservation[]> => {
   try {
     const response = await axios.get(API_URL + `/user/${userId}`);
