@@ -14,6 +14,9 @@ const theme = createTheme({
       light: '#CDEAEE',
       contrastText: '#F2EDDC'
     },
+    error: {
+      main: '#d32f2f'
+    },
     border: {
       main: '#D1D1D1'
     }

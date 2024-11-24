@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
-import { useAuth } from 'src/context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import {Box, Typography, TextField, InputAdornment} from '@mui/material';
+import {useTheme} from '@mui/material/styles';
+import backgroundImage from 'src/assets/books-background.png';
+import {Lock, Person} from '@mui/icons-material';
+import {useAuth} from 'src/context/AuthContext';
+import {useNavigate} from 'react-router-dom';
+import {StyledYellowOutlinedButton} from '../../mui-styled-components/styledYellowOutlinedButton';
 
 const Login: React.FC = () => {
-  const { login } = useAuth();
+  const theme = useTheme();
+
+  const {login} = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -17,28 +24,116 @@ const Login: React.FC = () => {
         navigate('/');
       }, 0);
     } catch {
-      setError('Invalid credentials.');
+      setError('Invalid credentials');
     }
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleLogin}>Login</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-    </div>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        padding: '2rem',
+        backgroundImage: `linear-gradient(rgba(27, 45, 49, 0.45), rgba(27, 45, 49, 0.45)), url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <Box
+        sx={{
+          backgroundColor: theme.palette.primary.main,
+          width: '100%',
+          maxWidth: '500px',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '3rem 4rem',
+          borderRadius: '1.5rem'
+        }}
+      >
+        <Typography
+          variant="h5"
+          sx={{
+            color: theme.palette.secondary.light,
+            textAlign: 'center',
+            mb: '3rem'
+          }}
+        >
+          Welcome to Library
+        </Typography>
+
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          error={!!error}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Person sx={{color: '#A5B0B7'}} />
+              </InputAdornment>
+            ),
+            style: {
+              backgroundColor: theme.palette.primary.light,
+              borderRadius: '1rem',
+              color: theme.palette.secondary.light
+            }
+          }}
+          sx={{
+            mb: '1.5rem'
+          }}
+        />
+
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Password"
+          type="password"
+          value={password}
+          error={!!error}
+          onChange={(e) => setPassword(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Lock sx={{color: '#A5B0B7'}} />
+              </InputAdornment>
+            ),
+            style: {
+              backgroundColor: theme.palette.primary.light,
+              borderRadius: '1rem',
+              color: theme.palette.secondary.light
+            }
+          }}
+          sx={{
+            mb: '.5rem'
+          }}
+        />
+
+        <Typography
+          sx={{
+            color: theme.palette.error.main,
+            mb: '2.5rem'
+          }}
+        >
+          {!!error ? error : ''}
+        </Typography>
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <StyledYellowOutlinedButton onClick={handleLogin}>Sign in</StyledYellowOutlinedButton>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
