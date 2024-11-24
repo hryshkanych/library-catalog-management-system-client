@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { User } from 'src/models/user.type';
 
 const API_URL = 'https://localhost:7239/users';
 
@@ -21,3 +22,13 @@ export const loginUser = async (username: string, password: string) => {
     throw error;
   }
 };
+
+export const getReaders = async (): Promise<User[]> => {
+  try {
+    const response = await axios.get(API_URL + '/readers');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching readers.', error);
+    throw error;
+  }
+}
