@@ -37,6 +37,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setRole(userData.role);
         localStorage.setItem('user', userData.username || '');
         localStorage.setItem('userRole', userData.role || '');
+        localStorage.setItem('userId', userData.userId || '');
       }
     } catch (error) {
       console.error('Login failed:', error);

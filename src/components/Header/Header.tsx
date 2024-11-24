@@ -6,6 +6,7 @@ import {StyledSearchBox} from 'src/mui-styled-components/styledSearch';
 import {useTheme} from '@mui/material/styles';
 import {StyledAppBar} from 'src/mui-styled-components/styledAppBar';
 import {StyledToolbar} from 'src/mui-styled-components/styledToolBar';
+import {Link, useLocation} from 'react-router-dom';
 
 interface HeaderProps {
   toggleFilters: () => void;
@@ -14,6 +15,19 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({toggleFilters, onSearch}) => {
   const theme = useTheme();
+  const location = useLocation();
+
+  const isRootPath = location.pathname === '/';
+  const role = localStorage.getItem('userRole');
+
+  const tabs = [
+    {label: 'Library', path: '', roles: ['Admin', 'Reader', 'Librarian']},
+    {label: 'Activity', path: '/activity', roles: ['Reader']},
+    {label: 'Users', path: '/users', roles: ['Librarian']},
+    {label: 'Books Management', path: '/books', roles: ['Admin']}
+  ];
+
+  const visibleTabs = tabs.filter((tab) => tab.roles.includes(role || ''));
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onSearch(event.target.value);
@@ -21,17 +35,56 @@ const Header: React.FC<HeaderProps> = ({toggleFilters, onSearch}) => {
 
   return (
     <StyledAppBar position="static">
-      <StyledToolbar sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%'}}>
-        <IconButton sx={{color: theme.palette.secondary.light}} onClick={toggleFilters}>
-          <Menu />
-        </IconButton>
-        <Box sx={{display: 'flex'}}>
+      <StyledToolbar
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          height: '100%'
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+            opacity: isRootPath ? 1 : 0,
+            visibility: isRootPath ? 'visible' : 'hidden'
+          }}
+        >
+          <IconButton sx={{color: theme.palette.secondary.light}} onClick={toggleFilters}>
+            <Menu />
+          </IconButton>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexGrow: 1,
+            justifyContent: 'center',
+            transition: 'margin 0.3s ease-in-out',
+            marginLeft: isRootPath ? 0 : '2rem'
+          }}
+        >
           <StyledTabs value={0}>
-            <StyledTab label="Library" />
-            <StyledTab label="Authors" />
-            <StyledTab label="Activity" />
+            {visibleTabs.map((tab, index) => (
+              <StyledTab
+                key={index}
+                label={
+                  <Link
+                    to={tab.path}
+                    style={{
+                      textDecoration: 'none'
+                    }}
+                  >
+                    {tab.label}
+                  </Link>
+                }
+              />
+            ))}
           </StyledTabs>
         </Box>
+
         <StyledSearchBox
           variant="outlined"
           size="small"
@@ -45,9 +98,24 @@ const Header: React.FC<HeaderProps> = ({toggleFilters, onSearch}) => {
               </InputAdornment>
             )
           }}
+          sx={{
+            transition: 'max-width 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+            maxWidth: isRootPath ? '300px' : '0',
+            opacity: isRootPath ? 1 : 0,
+            visibility: isRootPath ? 'visible' : 'hidden',
+            overflow: 'hidden'
+          }}
         />
-        <Box sx={{display: 'flex', alignItems: 'center'}}>
-          <IconButton sx={{color: theme.palette.secondary.light}}>
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            transition: 'margin 0.3s ease-in-out',
+            marginLeft: isRootPath ? '1rem' : 0
+          }}
+        >
+          <IconButton sx={{color: theme.palette.secondary.light, ml: 2}}>
             <Notifications />
           </IconButton>
           <Box sx={{display: 'flex', alignItems: 'center', marginLeft: '1rem'}}>
