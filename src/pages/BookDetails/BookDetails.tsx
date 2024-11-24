@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Box, Typography, Grid} from '@mui/material';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {Box, Typography, Grid, TextField, AutocompleteRenderInputParams, CircularProgress} from '@mui/material';
 import {StyledButton} from 'src/mui-styled-components/styledButton';
 import {StyledDataMarker} from 'src/mui-styled-components/styledDataMarker';
 import {useTheme} from '@mui/material/styles';
@@ -8,55 +8,127 @@ import {StyledMarkedBoxSecond} from 'src/mui-styled-components/styledMarkedBox';
 import {Book} from 'src/models/book.type';
 import {getBookById} from 'src/services/book.service';
 import {useParams} from 'react-router-dom';
-import {addReservation, cancelReservation, getReservationsByUserId} from 'src/services/reservation.service';
+import {addReservation, cancelReservation, getReservationsByBookId, getReservationsByUserId} from 'src/services/reservation.service';
+import {UserOption} from 'src/models/user.type';
+import {getReaders} from 'src/services/user.service';
+import {StyledAutocomplete} from 'src/mui-styled-components/styledAutocomplete';
+import {addBorrow, getBorrowsByBookId, returnBook} from 'src/services/borrow.service';
+import {Borrow} from 'src/models/borrow.type';
 
 const BookDetails: React.FC = () => {
   const theme = useTheme();
   const {id: bookId} = useParams<{id: string}>();
+
   const [book, setBook] = useState<Book>();
   const [reservationId, setReservationId] = useState<number>();
-  const [bookIsReserved, setBookIsReserved] = useState<boolean>(false);
+  const [reserved, setReserved] = useState<boolean>(false);
+  const [availability, setAvailability] = useState<boolean>(false);
+  const [borrowsByBookId, setBorrowsByBookId] = useState<Borrow[]>([]);
+  const [readersOptions, setReadersOptions] = useState<UserOption[]>([]);
+  const [selectedReader, setSelectedReader] = useState<number>();
+  const [isLoading, setIsLoading] = useState<boolean>(true); // Loading state
+
   const userId = localStorage.getItem('userId');
+  const userRole = localStorage.getItem('userRole');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const book = await getBookById(parseInt(bookId || ''));
+  const fetchBookDetails = useCallback(async () => {
+    setIsLoading(true); // Start loading
+
+    if (!bookId) {
+      setIsLoading(false); // Stop loading if no bookId
+      return;
+    }
+
+    try {
+      const book = await getBookById(parseInt(bookId));
       setBook(book);
-    };
 
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchReservations = async () => {
       const userIdNumber = parseInt(userId || '');
-      if (userIdNumber) {
-        const reservation = (await getReservationsByUserId(userIdNumber)).filter((r) => r.bookId === parseInt(bookId || '') && r.isActive);
-        if (reservation[0]) {
-          setBookIsReserved(true);
-          setReservationId(reservation[0].id);
+      if (userIdNumber && userRole === 'Reader') {
+        const reservations = (await getReservationsByUserId(userIdNumber)).filter((r) => r.bookId === parseInt(bookId) && r.isActive);
+        if (reservations[0]) {
+          setReserved(true);
+          setReservationId(reservations[0].id);
         }
       }
-    };
 
-    fetchReservations();
-  });
+      const bookIdNumber = parseInt(bookId);
+      if (bookIdNumber) {
+        const reservations = (await getReservationsByBookId(bookIdNumber)).filter((r) => r.isActive);
+        setAvailability(book?.copiesAvailable > reservations.length);
+
+        const borrows = (await getBorrowsByBookId(bookIdNumber)).filter((b) => !b.isReturned);
+        setBorrowsByBookId(borrows);
+
+        const readers = await getReaders();
+        const options: UserOption[] = readers.map((r) => {
+          return {
+            id: r.id,
+            username: r.username,
+            reserve: reservations.map((r) => r.userId).includes(r.id),
+            borrow: borrows.map((b) => b.userId).includes(r.id)
+          };
+        });
+        setReadersOptions(options);
+      }
+    } catch (error) {
+      console.error('Error fetching book details:', error);
+    } finally {
+      setIsLoading(false); // Stop loading once data is fetched
+    }
+  }, [bookId, userId, userRole]);
+
+  // Refetch borrow status when borrows or selectedReader changes
+  useEffect(() => {
+    fetchBookDetails();
+  }, [fetchBookDetails]);
+
+  const borrowed = useMemo(() => {
+    return borrowsByBookId.some((b) => b.userId === selectedReader);
+  }, [selectedReader, borrowsByBookId]);
 
   const handleReservation = async () => {
     const numberUserId = parseInt(userId || '');
     const numberBookId = parseInt(bookId || '');
     if (numberBookId && numberUserId) {
       const result = await addReservation(numberUserId, numberBookId);
-      setBookIsReserved(!!result);
+      setReserved(!!result);
     }
   };
 
   const handleCancelReservation = async () => {
     if (reservationId) {
       const result = await cancelReservation(reservationId);
-      setBookIsReserved(!result);
+      setReserved(!result);
     }
   };
+
+  const handleBorrow = async () => {
+    const numberBookId = parseInt(bookId || '');
+
+    if (numberBookId && selectedReader) {
+      await addBorrow(selectedReader, numberBookId);
+      fetchBookDetails(); // Refresh borrow status after borrow
+    }
+  };
+
+  const handleReturn = async () => {
+    const numberBookId = parseInt(bookId || '');
+    const borrow = borrowsByBookId.find((b) => b.bookId === numberBookId && b.userId === selectedReader);
+
+    if (!!borrow) {
+      await returnBook(borrow.id);
+      fetchBookDetails(); // Refresh borrow status after return
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+        <CircularProgress size={50} />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{display: 'flex', flexDirection: 'row', padding: '1.5rem', height: '100%', width: '100%'}}>
@@ -88,24 +160,62 @@ const BookDetails: React.FC = () => {
               ))}
             </Grid>
           </Box>
-          <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: '30%'}}>
-            <StyledMarkedBoxSecond
-              bgColor={!book?.copiesAvailable || book.copiesAvailable < 1 ? theme.palette.error.main : theme.palette.secondary.dark}
-            >
-              <Typography variant="body1" sx={{color: theme.palette.secondary.contrastText}}>
-                {book?.copiesAvailable && book.copiesAvailable > 0 ? 'Available' : 'Unavailable'}
-              </Typography>
-            </StyledMarkedBoxSecond>
-            {book?.copiesAvailable && book?.copiesAvailable > 0 && (
-              <StyledButton
-                onClick={() => (bookIsReserved ? handleCancelReservation() : handleReservation())}
-                variant="outlined"
-                startIcon={<ImportContactsIcon sx={{mr: 1}} />}
-              >
-                {bookIsReserved ? 'Cancel reservation' : 'Reserve Book'}
-              </StyledButton>
-            )}
-          </Box>
+          {userRole === 'Reader' ? (
+            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: '30%'}}>
+              <StyledMarkedBoxSecond bgColor={availability || borrowed ? theme.palette.secondary.dark : theme.palette.error.main}>
+                <Typography variant="body1" sx={{color: theme.palette.secondary.contrastText}}>
+                  {borrowed ? 'Borrowed' : availability ? 'Available' : 'Unavailable'}
+                </Typography>
+              </StyledMarkedBoxSecond>
+              {availability && !borrowed && (
+                <StyledButton
+                  onClick={() => (reserved ? handleCancelReservation() : handleReservation())}
+                  variant="outlined"
+                  startIcon={<ImportContactsIcon sx={{mr: 1}} />}
+                >
+                  {reserved ? 'Cancel reservation' : 'Reserve Book'}
+                </StyledButton>
+              )}
+            </Box>
+          ) : (
+            userRole === 'Librarian' && (
+              <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: '30%'}}>
+                <StyledAutocomplete
+                  options={readersOptions}
+                  onChange={(_, newValue) => {
+                    if (!!newValue && typeof newValue === 'object' && 'id' in newValue) setSelectedReader(newValue.id);
+                  }}
+                  getOptionLabel={(option) => {
+                    if (typeof option !== 'string' && 'reserve' in option) {
+                      return option.reserve ? `${option.username} : reserved` : option.username;
+                    }
+                    return '';
+                  }}
+                  renderOption={(props, option) => (
+                    <li {...props}>
+                      {option.username}
+                      {option.borrow && ': borrowed'}
+                      {option.reserve && ': reserved'}
+                    </li>
+                  )}
+                  renderInput={(params: AutocompleteRenderInputParams) => <TextField {...params} label="Reader" variant="outlined" />}
+                  sx={{width: 300}}
+                />
+
+                {selectedReader && (
+                  <StyledButton
+                    disabled={!availability}
+                    onClick={() => (borrowed ? handleReturn() : handleBorrow())}
+                    variant="outlined"
+                    startIcon={<ImportContactsIcon sx={{mr: 1}} />}
+                    sx={{width: 250}}
+                  >
+                    {borrowed ? 'Return the book' : 'Borrow the book'}
+                  </StyledButton>
+                )}
+              </Box>
+            )
+          )}
         </Box>
         <Box sx={{backgroundColor: theme.palette.primary.light, borderRadius: '1.5rem', padding: 3}}>
           <Typography variant="h5" sx={{color: theme.palette.secondary.light, mb: 1}}>

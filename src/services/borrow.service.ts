@@ -1,9 +1,9 @@
 import axios from 'axios';
-import {Reservation} from 'src/models/reservation.type';
+import { Borrow } from 'src/models/borrow.type';
 
-const API_URL = 'https://localhost:7239/reservations';
+const API_URL = 'https://localhost:7239/borrows';
 
-export const getReservationsByUserId = async (userId: number): Promise<Reservation[]> => {
+export const getBorrowsByUserId = async (userId: number): Promise<Borrow[]> => {
   try {
     const response = await axios.get(API_URL + `/user/${userId}`);
     return response.data;
@@ -13,9 +13,9 @@ export const getReservationsByUserId = async (userId: number): Promise<Reservati
   }
 };
 
-export const getReservationsByBookId = async (userId: number): Promise<Reservation[]> => {
+export const getBorrowsByBookId = async (bookId: number): Promise<Borrow[]> => {
   try {
-    const response = await axios.get(API_URL + `/book/${userId}`);
+    const response = await axios.get(API_URL + `/book/${bookId}`);
     return response.data;
   } catch (error) {
     console.error('Error registering user:', error);
@@ -23,7 +23,7 @@ export const getReservationsByBookId = async (userId: number): Promise<Reservati
   }
 };
 
-export const addReservation = async (userId: number, bookId: number): Promise<Reservation> => {
+export const addBorrow = async (userId: number, bookId: number): Promise<Borrow> => {
   try {
     const response = await axios.post(API_URL, {userId, bookId});
     return response.data;
@@ -33,9 +33,9 @@ export const addReservation = async (userId: number, bookId: number): Promise<Re
   }
 };
 
-export const cancelReservation = async (id: number): Promise<boolean> => {
+export const returnBook = async (id: number): Promise<boolean> => {
   try {
-    const response = await axios.delete(`${API_URL}/${id}`);
+    const response = await axios.put(`${API_URL}/return/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error canceling reservation:', error);
