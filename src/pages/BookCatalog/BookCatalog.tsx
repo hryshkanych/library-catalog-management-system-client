@@ -7,6 +7,7 @@ import BookDetails from '../BookDetails/BookDetails';
 import {Book} from 'src/models/book.type';
 import {getBooks, getGenres} from 'src/services/book.service';
 import {FilterCategory, Filters} from 'src/types/filterEntities.type';
+import ReadersActivity from '../ReadersActivity/ReadersActivity';
 
 const BookCatalog: React.FC = () => {
   const [isFiltersVisible, setFiltersVisible] = useState<boolean>(true);
@@ -86,13 +87,12 @@ const BookCatalog: React.FC = () => {
         <Header toggleFilters={toggleFilters} onSearch={setSearchQuery} />
       </header>
       <main className="flex flex-grow">
-        {location.pathname === '/' && (
-          <SideBar isVisible={isFiltersVisible} filters={filters} handleFilterChange={handleFilterChange} />
-        )}
+        {location.pathname === '/' && <SideBar isVisible={isFiltersVisible} filters={filters} handleFilterChange={handleFilterChange} />}
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<BookDashboard books={filteredBooks} />} />
             <Route path="/book/:id" element={<BookDetails />} />
+            <Route path="/readers-activity" element={<ReadersActivity />}></Route>
           </Routes>
         </div>
       </main>

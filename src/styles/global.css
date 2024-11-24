@@ -25,3 +25,22 @@ body {
   -moz-osx-font-smoothing: var(--font-smoothing);
   text-rendering: var(--text-rendering);
 }
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #1F3438;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: #263F44;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #1F3438 #263F44;
+}

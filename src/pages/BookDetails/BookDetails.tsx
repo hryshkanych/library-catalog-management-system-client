@@ -26,16 +26,16 @@ const BookDetails: React.FC = () => {
   const [borrowsByBookId, setBorrowsByBookId] = useState<Borrow[]>([]);
   const [readersOptions, setReadersOptions] = useState<UserOption[]>([]);
   const [selectedReader, setSelectedReader] = useState<number>();
-  const [isLoading, setIsLoading] = useState<boolean>(true); // Loading state
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const userId = localStorage.getItem('userId');
   const userRole = localStorage.getItem('userRole');
 
   const fetchBookDetails = useCallback(async () => {
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
 
     if (!bookId) {
-      setIsLoading(false); // Stop loading if no bookId
+      setIsLoading(false);
       return;
     }
 
@@ -74,11 +74,10 @@ const BookDetails: React.FC = () => {
     } catch (error) {
       console.error('Error fetching book details:', error);
     } finally {
-      setIsLoading(false); // Stop loading once data is fetched
+      setIsLoading(false);
     }
   }, [bookId, userId, userRole]);
 
-  // Refetch borrow status when borrows or selectedReader changes
   useEffect(() => {
     fetchBookDetails();
   }, [fetchBookDetails]);
@@ -108,7 +107,7 @@ const BookDetails: React.FC = () => {
 
     if (numberBookId && selectedReader) {
       await addBorrow(selectedReader, numberBookId);
-      fetchBookDetails(); // Refresh borrow status after borrow
+      fetchBookDetails();
     }
   };
 
@@ -118,7 +117,7 @@ const BookDetails: React.FC = () => {
 
     if (!!borrow) {
       await returnBook(borrow.id);
-      fetchBookDetails(); // Refresh borrow status after return
+      fetchBookDetails();
     }
   };
 
