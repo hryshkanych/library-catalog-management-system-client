@@ -8,6 +8,6 @@ export type Reservation = {
   reservationDate: Date;
   expirationDate: Date;
   isActive: boolean;
-  book?: Book;
   user?: User;
+  book?: Book;
 }

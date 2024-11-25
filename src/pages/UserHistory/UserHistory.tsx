@@ -6,7 +6,7 @@ import { getBorrowsByUserId } from 'src/services/borrow.service';
 import { Borrow } from 'src/models/borrow.type';
 import { Reservation } from 'src/models/reservation.type';
 
-interface HistoryData {
+type HistoryData = {
   type: string;
   startDate: Date;
   expirationDate: Date;

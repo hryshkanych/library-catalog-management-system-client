@@ -3,6 +3,16 @@ import { Borrow } from 'src/models/borrow.type';
 
 const API_URL = 'https://localhost:7239/borrows';
 
+export const getBorrows = async (): Promise<Borrow[]> => {
+  try {
+    const response = await axios.get(API_URL);
+    return response.data;
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw error;
+  }
+};
+
 export const getBorrowsByUserId = async (userId: number): Promise<Borrow[]> => {
   try {
     const response = await axios.get(API_URL + `/user/${userId}`);
