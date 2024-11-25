@@ -1,3 +1,6 @@
+import { Book } from "./book.type";
+import { User } from "./user.type";
+
 export type Borrow = {
   id: number;
   userId: number;
@@ -5,4 +8,6 @@ export type Borrow = {
   borrowDate: Date;
   returnDate: Date;
   isReturned: boolean;
+  book?: Book;
+  user?: User;
 };
