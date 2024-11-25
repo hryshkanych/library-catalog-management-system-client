@@ -3,20 +3,23 @@ import { Box, TableBody, TableHead, TableRow, Chip, useTheme } from '@mui/materi
 import { StyledTable, StyledTableContainer, StyledBaseCell, StyledHeaderCell, StyledRow } from 'src/mui-styled-components/styledTable';
 import { getReservationsByUserId } from 'src/services/reservation.service';
 import { getBorrowsByUserId } from 'src/services/borrow.service';
-import { getBookById } from 'src/services/book.service'; 
-import { Book } from 'src/models/book.type';
+import { Borrow } from 'src/models/borrow.type';
+import { Reservation } from 'src/models/reservation.type';
 
-interface HistoryData {
-    type: string;
-    startDate: Date;
-    expirationDate: Date;
-    isActive: boolean;
-    book: Book;
+type HistoryData = {
+  type: string;
+  startDate: Date;
+  expirationDate: Date;
+  isActive: boolean;
+  book: {
+    title: string;
+    author: string;
+  };
 }
 
 const UserHistory: React.FC = () => {
-  const [historyData, setHistoryData] = useState<HistoryData[]>([]); 
-  const [loading, setLoading] = useState<boolean>(true); 
+  const [historyData, setHistoryData] = useState<HistoryData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const userId = localStorage.getItem('userId');
   const theme = useTheme();
 
@@ -24,46 +27,32 @@ const UserHistory: React.FC = () => {
     if (userId) {
       const fetchData = async () => {
         try {
-          const reservations = await getReservationsByUserId(Number(userId));
-          const borrows = await getBorrowsByUserId(Number(userId));
+          const reservations: Reservation[] = await getReservationsByUserId(Number(userId));
+          const borrows: Borrow[] = await getBorrowsByUserId(Number(userId));
 
-          const reservationsWithBooks = await Promise.all(
-            reservations.map(async (r) => {
-              const book = await getBookById(r.bookId); 
-              return {
-                type: 'Reservation',
-                startDate: r.reservationDate,
-                expirationDate: r.expirationDate,
-                isActive: r.isActive,
-                book,
-              };
-            })
-          );
+          const reservationsData = reservations.map((r) => ({
+            type: 'Reservation',
+            startDate: r.reservationDate,
+            expirationDate: r.expirationDate,
+            isActive: r.isActive,
+            book: r.book!,
+          }));
 
-          const borrowsWithBooks = await Promise.all(
-            borrows.map(async (b) => {
-              const book = await getBookById(b.bookId); 
-              return {
-                type: 'Borrow',
-                startDate: b.borrowDate,
-                expirationDate: b.returnDate,
-                isActive: !b.isReturned,
-                book,
-              };
-            })
-          );
+          const borrowsData = borrows.map((b) => ({
+            type: 'Borrow',
+            startDate: b.borrowDate,
+            expirationDate: b.returnDate,
+            isActive: !b.isReturned,
+            book: b.book!,
+          }));
 
-          const combined = [
-            ...reservationsWithBooks,
-            ...borrowsWithBooks,
-          ];
-
+          const combined = [...reservationsData, ...borrowsData];
           combined.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
 
           setHistoryData(combined);
-          setLoading(false); 
         } catch (error) {
           console.error('Error fetching data:', error);
+        } finally {
           setLoading(false);
         }
       };
@@ -73,7 +62,7 @@ const UserHistory: React.FC = () => {
   }, [userId]);
 
   if (loading) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
 
   return (
@@ -92,7 +81,7 @@ const UserHistory: React.FC = () => {
           <TableBody>
             {historyData.map((entry, index) => (
               <StyledRow key={index}>
-                <StyledBaseCell sx={{ fontWeight: 'bold'}}>{entry.type}</StyledBaseCell>
+                <StyledBaseCell sx={{ fontWeight: 'bold' }}>{entry.type}</StyledBaseCell>
                 <StyledBaseCell>
                   {entry.book.title} by {entry.book.author}
                 </StyledBaseCell>
