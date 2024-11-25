@@ -10,17 +10,16 @@ import {FilterCategory, Filters} from 'src/types/filterEntities.type';
 import UserHistory from '../UserHistory/UserHistory';
 import ReadersActivity from '../ReadersActivity/ReadersActivity';
 
-
 const BookCatalog: React.FC = () => {
   const [isFiltersVisible, setFiltersVisible] = useState<boolean>(true);
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     availability: {available: false, rented: false, favorite: false},
-    languages: {english: false, spanish: false, french: false},
+    languages: {English: false, Spanish: false, French: false},
     genres: {}
   });
-  const [likedBooks, setLikedBooks] = useState<number[]>([]);
+  const [likedBooks, setLikedBooks] = useState<number[]>(JSON.parse(localStorage.getItem('likedBooks') || '[]'));
 
   const location = useLocation();
 
@@ -49,18 +48,17 @@ const BookCatalog: React.FC = () => {
         ? Object.entries(filters.genres).some(([genre, isChecked]) => isChecked && book.genre === genre)
         : true;
 
+      const matchesLanguages = Object.entries(filters.languages).some(([_, isChecked]) => isChecked)
+        ? Object.entries(filters.languages).some(([language, isChecked]) => isChecked && book.language === language)
+        : true;
+
       const matchesSearch = searchQuery
         ? book.title.toLowerCase().includes(searchQuery.toLowerCase()) || book.author.toLowerCase().includes(searchQuery.toLowerCase())
         : true;
 
-      return matchesAvailability && matchesGenres && matchesSearch;
+      return matchesAvailability && matchesGenres && matchesSearch && matchesLanguages;
     });
   }, [books, filters, searchQuery]);
-
-  useEffect(() => {
-    const savedLikes = JSON.parse(localStorage.getItem('likedBooks') || '[]');
-    setLikedBooks(savedLikes);
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,7 +90,7 @@ const BookCatalog: React.FC = () => {
         {location.pathname === '/' && <SideBar isVisible={isFiltersVisible} filters={filters} handleFilterChange={handleFilterChange} />}
         <div className="flex-grow">
           <Routes>
-            <Route path="/" element={<BookDashboard books={filteredBooks} />} />
+            <Route path="/" element={<BookDashboard books={filteredBooks} likedBooks={likedBooks} setLikedBooks={setLikedBooks} />} />
             <Route path="/book/:id" element={<BookDetails />} />
             <Route path="/activity" element={<UserHistory />} />
             <Route path="/readers-activity" element={<ReadersActivity />}></Route>
