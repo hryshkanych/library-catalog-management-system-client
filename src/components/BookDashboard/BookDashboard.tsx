@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {SetStateAction, useEffect} from 'react';
 import {Box, CardContent, Typography, IconButton} from '@mui/material';
 import {Favorite, FavoriteBorder} from '@mui/icons-material';
 import {StyledGridBox} from 'src/mui-styled-components/styledGridBox';
@@ -11,17 +11,13 @@ import {Book} from 'src/models/book.type';
 
 interface BookDashboardProps {
   books: Book[];
+  likedBooks: number[];
+  setLikedBooks: React.Dispatch<SetStateAction<number[]>>;
 }
 
-const BookDashboard: React.FC<BookDashboardProps> = ({books}) => {
+const BookDashboard: React.FC<BookDashboardProps> = ({books, likedBooks, setLikedBooks}) => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const [likedBooks, setLikedBooks] = useState<number[]>([]);
-
-  useEffect(() => {
-    const savedLikes = JSON.parse(localStorage.getItem('likedBooks') || '[]');
-    setLikedBooks(savedLikes);
-  }, []);
 
   useEffect(() => {
     localStorage.setItem('likedBooks', JSON.stringify(likedBooks));
@@ -37,7 +33,7 @@ const BookDashboard: React.FC<BookDashboardProps> = ({books}) => {
         {books.map((book, index) => (
           <StyledCard key={index}>
             <img
-              src={`https://picsum.photos/200/300?random=${index}`}
+              src={book.imageURL}
               alt={`Book ${index + 1}`}
               style={{
                 width: '100%',
@@ -46,7 +42,17 @@ const BookDashboard: React.FC<BookDashboardProps> = ({books}) => {
               }}
             />
             <CardContent sx={{display: 'flex', flexDirection: 'column', padding: '0.5rem'}}>
-              <Typography variant="h6" sx={{color: theme.palette.secondary.contrastText, marginBottom: '0.25rem'}}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: theme.palette.secondary.contrastText,
+                  marginBottom: '0.25rem',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%'
+                }}
+              >
                 {book.title}
               </Typography>
               <Typography variant="body2" sx={{color: theme.palette.secondary.main, marginBottom: '0.5rem'}}>
