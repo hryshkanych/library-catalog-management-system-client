@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Box, Typography, TextField, InputAdornment} from '@mui/material';
 import {useTheme} from '@mui/material/styles';
 import backgroundImage from 'src/assets/books-background.png';
-import {Lock, Person} from '@mui/icons-material';
+import {EmailOutlined, LockOutlined} from '@mui/icons-material';
 import {useAuth} from 'src/context/AuthContext';
 import {useNavigate} from 'react-router-dom';
 import {StyledYellowOutlinedButton} from '../../mui-styled-components/styledYellowOutlinedButton';
@@ -11,7 +11,7 @@ const Login: React.FC = () => {
   const theme = useTheme();
 
   const {login} = useAuth();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Login: React.FC = () => {
   const handleLogin = async () => {
     try {
       setError(null);
-      await login(username, password);
+      await login(email, password);
       setTimeout(() => {
         navigate('/');
       }, 0);
@@ -68,14 +68,14 @@ const Login: React.FC = () => {
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           error={!!error}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Person sx={{color: '#A5B0B7'}} />
+                <EmailOutlined sx={{color: '#A5B0B7'}} />
               </InputAdornment>
             ),
             style: {
@@ -106,7 +106,7 @@ const Login: React.FC = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Lock sx={{color: '#A5B0B7'}} />
+                <LockOutlined sx={{color: '#A5B0B7'}} />
               </InputAdornment>
             ),
             style: {
