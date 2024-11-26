@@ -12,6 +12,8 @@ const ReadersActivity: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const userId = localStorage.getItem('userId');
+
   const fetchData = async () => {
     setIsLoading(true);
 
@@ -26,7 +28,7 @@ const ReadersActivity: React.FC = () => {
           bookId: b.bookId,
           startDate: b.borrowDate,
           type: 'borrow' as const,
-          user: b.user,
+          user: b.reader,
           book: b.book
         })),
         ...activeReservations.map((r) => ({
@@ -57,7 +59,9 @@ const ReadersActivity: React.FC = () => {
 
   const handleBorrow = async (action: Action) => {
     try {
-      await addBorrow(action.userId, action.bookId);
+      const librarianId = parseInt(userId || '');
+
+      await addBorrow(action.userId, action.bookId, librarianId);
       enqueueSnackbar(`Book borrowed successfully: "${action.book?.title}" by ${action.user?.username} (${action.user?.email})`, {
         variant: 'success'
       });
@@ -131,21 +135,23 @@ const ReadersActivity: React.FC = () => {
               <strong>Book:</strong> {action.book?.title} by {action.book?.author}
             </Typography>
             <Typography>
-              <strong>Start Date:</strong> {new Date(action.startDate).toLocaleDateString()}
+              <strong>Start Date:</strong> {new Date(action.startDate).toLocaleDateString()}{' '}
+              {new Intl.DateTimeFormat('en-US', {hour: '2-digit', minute: '2-digit', hour12: true}).format(new Date(action.startDate))}
             </Typography>
             {action.endDate && (
               <Typography>
-                <strong>End Date:</strong> {new Date(action.endDate).toLocaleDateString()}
+                <strong>End Date:</strong> {new Date(action.endDate).toLocaleDateString()}{' '}
+                {new Intl.DateTimeFormat('en-US', {hour: '2-digit', minute: '2-digit', hour12: true}).format(new Date(action.endDate))}
               </Typography>
             )}
           </Box>
           {action.type === 'reservation' && (
-            <StyledButton onClick={() => handleBorrow(action)} variant="outlined" sx={{width: '15rem'}} startIcon={<ImportContactsIcon />}>
+            <StyledButton onClick={() => handleBorrow(action)} variant="outlined" sx={{minWidth: '15rem'}} startIcon={<ImportContactsIcon />}>
               Borrow the book
             </StyledButton>
           )}
           {action.type === 'borrow' && (
-            <StyledButton onClick={() => handleReturn(action)} variant="outlined" sx={{width: '15rem'}} startIcon={<ImportContactsIcon />}>
+            <StyledButton onClick={() => handleReturn(action)} variant="outlined" sx={{minWidth: '15rem'}} startIcon={<ImportContactsIcon />}>
               Return the book
             </StyledButton>
           )}

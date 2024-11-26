@@ -104,9 +104,10 @@ const BookDetails: React.FC = () => {
 
   const handleBorrow = async () => {
     const numberBookId = parseInt(bookId || '');
+    const librarianId = parseInt(userId || '');
 
-    if (numberBookId && selectedReader) {
-      await addBorrow(selectedReader, numberBookId);
+    if (numberBookId && selectedReader && librarianId) {
+      await addBorrow(selectedReader, numberBookId, librarianId);
       fetchBookDetails();
     }
   };
