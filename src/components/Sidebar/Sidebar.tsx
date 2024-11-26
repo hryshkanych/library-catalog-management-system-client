@@ -15,7 +15,7 @@ const SideBar: React.FC<SideBarProps> = ({isVisible, filters, handleFilterChange
   return (
     <StyledSidebarBox isVisible={isVisible}>
       <Box sx={{padding: '1rem'}}>
-        <Typography variant="h6" sx={{marginBottom: '1rem', color: 'secondary.light'}}>
+        <Typography variant="h6" sx={{marginBottom: '0.5rem', color: 'secondary.light'}}>
           Availability
         </Typography>
         {Object.entries(filters.availability).map(([key, value]) => (
@@ -25,9 +25,9 @@ const SideBar: React.FC<SideBarProps> = ({isVisible, filters, handleFilterChange
             label={key.charAt(0).toUpperCase() + key.slice(1)}
           />
         ))}
-        <Divider sx={{margin: '1rem 0'}} />
+        <Divider sx={{margin: '0.7rem 0'}} />
 
-        <Typography variant="h6" sx={{marginBottom: '1rem', color: 'secondary.light'}}>
+        <Typography variant="h6" sx={{marginBottom: '0.5rem', color: 'secondary.light'}}>
           Languages
         </Typography>
         {Object.entries(filters.languages).map(([key, value]) => (
@@ -37,9 +37,9 @@ const SideBar: React.FC<SideBarProps> = ({isVisible, filters, handleFilterChange
             label={key.charAt(0).toUpperCase() + key.slice(1)}
           />
         ))}
-        <Divider sx={{margin: '1rem 0'}} />
+        <Divider sx={{margin: '0.7rem 0'}} />
 
-        <Typography variant="h6" sx={{marginBottom: '1rem', color: 'secondary.light'}}>
+        <Typography variant="h6" sx={{marginBottom: '0.5rem', color: 'secondary.light'}}>
           Genres
         </Typography>
         {Object.entries(filters.genres).map(([key, value]) => (
