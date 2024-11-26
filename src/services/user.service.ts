@@ -13,9 +13,9 @@ export const registerUser = async (username: string, password: string, role: str
   }
 };
 
-export const loginUser = async (username: string, password: string) => {
+export const loginUser = async (email: string, password: string) => {
   try {
-    const response = await axios.post(API_URL + '/login', {username, password}, {withCredentials: true});
+    const response = await axios.post(API_URL + '/login', {email, password}, {withCredentials: true});
     return response.data;
   } catch (error) {
     console.error('Error logging in:', error);
