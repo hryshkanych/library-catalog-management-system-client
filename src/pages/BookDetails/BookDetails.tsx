@@ -131,7 +131,7 @@ const BookDetails: React.FC = () => {
 
   return (
     <Box sx={{display: 'flex', flexDirection: 'row', padding: '1.5rem', height: '100%', width: '100%'}}>
-      <Box component="img" src={book?.imageURL} alt="Book Cover" sx={{objectFit: 'cover', height: '100%', borderRadius: 2}} />
+      <Box component="img" src={book?.imageURL} alt="Book Cover" sx={{objectFit: 'cover', height: '100%', borderRadius: 2, maxWidth: '30%'}} />
       <Box sx={{flex: 2, ml: 4, mt: 4, display: 'flex', flexDirection: 'column'}}>
         <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', mb: 4}}>
           <Box sx={{width: '70%'}}>

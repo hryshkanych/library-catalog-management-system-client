@@ -18,6 +18,7 @@ interface BookDashboardProps {
 const BookDashboard: React.FC<BookDashboardProps> = ({books, likedBooks, setLikedBooks}) => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const role = localStorage.getItem('userRole');
 
   useEffect(() => {
     localStorage.setItem('likedBooks', JSON.stringify(likedBooks));
@@ -28,7 +29,7 @@ const BookDashboard: React.FC<BookDashboardProps> = ({books, likedBooks, setLike
   };
 
   return (
-    <StyledMainContentBox>
+    <StyledMainContentBox className="custom-scrollbar">
       <StyledGridBox>
         {books.map((book, index) => (
           <StyledCard key={index}>
@@ -71,9 +72,11 @@ const BookDashboard: React.FC<BookDashboardProps> = ({books, likedBooks, setLike
                 >
                   View
                 </Typography>
-                <IconButton sx={{marginLeft: '0.5rem', color: theme.palette.secondary.main}} onClick={() => handleLikeToggle(book.id)}>
-                  {likedBooks.includes(book.id) ? <Favorite /> : <FavoriteBorder />}
-                </IconButton>
+                {role === 'Reader' && (
+                  <IconButton sx={{marginLeft: '0.5rem', color: theme.palette.secondary.main}} onClick={() => handleLikeToggle(book.id)}>
+                    {likedBooks.includes(book.id) ? <Favorite /> : <FavoriteBorder />}
+                  </IconButton>
+                )}
               </Box>
             </CardContent>
           </StyledCard>
