@@ -85,7 +85,13 @@ const Login: React.FC = () => {
             }
           }}
           sx={{
-            mb: '1.5rem'
+            mb: '.5rem',
+            '& .MuiInputBase-input': {
+              '&:-webkit-autofill': {
+                WebkitBoxShadow: `0 0 0 100px ${theme.palette.primary.light} inset`,
+                WebkitTextFillColor: theme.palette.secondary.light
+              }
+            }
           }}
         />
 
@@ -110,7 +116,13 @@ const Login: React.FC = () => {
             }
           }}
           sx={{
-            mb: '.5rem'
+            mb: '.5rem',
+            '& .MuiInputBase-input': {
+              '&:-webkit-autofill': {
+                WebkitBoxShadow: `0 0 0 100px ${theme.palette.primary.light} inset`,
+                WebkitTextFillColor: theme.palette.secondary.light
+              }
+            }
           }}
         />
 
