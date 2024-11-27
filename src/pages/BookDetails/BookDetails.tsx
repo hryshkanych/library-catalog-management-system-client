@@ -14,6 +14,7 @@ import {getReaders} from 'src/services/user.service';
 import {StyledAutocomplete} from 'src/mui-styled-components/styledAutocomplete';
 import {addBorrow, getBorrowsByBookId, returnBook} from 'src/services/borrow.service';
 import {Borrow} from 'src/models/borrow.type';
+import {enqueueSnackbar} from 'notistack';
 
 const BookDetails: React.FC = () => {
   const theme = useTheme();
@@ -90,15 +91,31 @@ const BookDetails: React.FC = () => {
     const numberUserId = parseInt(userId || '');
     const numberBookId = parseInt(bookId || '');
     if (numberBookId && numberUserId) {
-      const result = await addReservation(numberUserId, numberBookId);
-      setReserved(!!result);
+      try {
+        const result = await addReservation(numberUserId, numberBookId);
+        setReserved(!!result);
+        setReservationId(result.id);
+        enqueueSnackbar('The reservation was added successfuly', {variant: 'success'});
+      } catch (e: any) {
+        const errorMessage = e.response?.data?.message || 'An unexpected error occurred.';
+        enqueueSnackbar(errorMessage, {variant: 'error'});
+        fetchBookDetails();
+      }
     }
   };
 
   const handleCancelReservation = async () => {
+    console.log(reservationId);
     if (reservationId) {
       const result = await cancelReservation(reservationId);
       setReserved(!result);
+      setReservationId(undefined);
+
+      if (result) {
+        enqueueSnackbar('The reservation was canceled successfuly', {variant: 'success'});
+      } else {
+        enqueueSnackbar('An unexpected error occurred while canceling reservation.', {variant: 'error'});
+      }
     }
   };
 
@@ -107,7 +124,13 @@ const BookDetails: React.FC = () => {
     const librarianId = parseInt(userId || '');
 
     if (numberBookId && selectedReader && librarianId) {
-      await addBorrow(selectedReader, numberBookId, librarianId);
+      try {
+        await addBorrow(selectedReader, numberBookId, librarianId);
+        enqueueSnackbar('Book borrowed successfully', {variant: 'success'});
+      } catch (error) {
+        console.error('Error borrowing book:', error);
+        enqueueSnackbar('Failed to borrow book', {variant: 'error'});
+      }
       fetchBookDetails();
     }
   };
@@ -117,7 +140,12 @@ const BookDetails: React.FC = () => {
     const borrow = borrowsByBookId.find((b) => b.bookId === numberBookId && b.userId === selectedReader);
 
     if (!!borrow) {
-      await returnBook(borrow.id);
+      try {
+        await returnBook(borrow.id);
+        enqueueSnackbar('Book returned successfully.', {variant: 'success'});
+      } catch (error) {
+        enqueueSnackbar('Failed to return book', {variant: 'error'});
+      }
       fetchBookDetails();
     }
   };
