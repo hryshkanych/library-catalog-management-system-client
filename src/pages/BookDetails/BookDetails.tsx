@@ -66,8 +66,8 @@ const BookDetails: React.FC = () => {
           return {
             id: r.id,
             username: r.username,
-            reserve: reservations.map((r) => r.userId).includes(r.id),
-            borrow: borrows.map((b) => b.userId).includes(r.id)
+            reserve: reservations.map((r) => r.readerId).includes(r.id),
+            borrow: borrows.map((b) => b.readerId).includes(r.id)
           };
         });
         setReadersOptions(options);
@@ -84,7 +84,7 @@ const BookDetails: React.FC = () => {
   }, [fetchBookDetails]);
 
   const borrowed = useMemo(() => {
-    return borrowsByBookId.some((b) => b.userId === selectedReader);
+    return borrowsByBookId.some((b) => b.readerId === selectedReader);
   }, [selectedReader, borrowsByBookId]);
 
   const handleReservation = async () => {
@@ -105,7 +105,6 @@ const BookDetails: React.FC = () => {
   };
 
   const handleCancelReservation = async () => {
-    console.log(reservationId);
     if (reservationId) {
       const result = await cancelReservation(reservationId);
       setReserved(!result);
@@ -137,7 +136,7 @@ const BookDetails: React.FC = () => {
 
   const handleReturn = async () => {
     const numberBookId = parseInt(bookId || '');
-    const borrow = borrowsByBookId.find((b) => b.bookId === numberBookId && b.userId === selectedReader);
+    const borrow = borrowsByBookId.find((b) => b.bookId === numberBookId && b.readerId === selectedReader);
 
     if (!!borrow) {
       try {

@@ -3,7 +3,7 @@ import { User } from "./user.type";
 
 export type Reservation = {
   id: number;
-  userId: number;
+  readerId: number;
   bookId: number;
   reservationDate: Date;
   expirationDate: Date;

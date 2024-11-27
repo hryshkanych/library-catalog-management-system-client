@@ -33,9 +33,9 @@ export const getBorrowsByBookId = async (bookId: number): Promise<Borrow[]> => {
   }
 };
 
-export const addBorrow = async (userId: number, bookId: number, librarianId: number): Promise<Borrow> => {
+export const addBorrow = async (readerId: number, bookId: number, librarianId: number): Promise<Borrow> => {
   try {
-    const response = await axios.post(API_URL, {userId, bookId, librarianId});
+    const response = await axios.post(API_URL, {readerId, bookId, librarianId});
     return response.data;
   } catch (error) {
     console.error('Error adding reservation:', error);

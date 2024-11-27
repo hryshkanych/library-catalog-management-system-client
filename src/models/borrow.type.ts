@@ -3,7 +3,7 @@ import { User } from "./user.type";
 
 export type Borrow = {
   id: number;
-  userId: number;
+  readerId: number;
   bookId: number;
   librarianId: number;
   borrowDate: Date;
