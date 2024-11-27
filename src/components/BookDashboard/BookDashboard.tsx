@@ -1,5 +1,5 @@
 import React, {SetStateAction, useEffect} from 'react';
-import {Box, CardContent, Typography, IconButton} from '@mui/material';
+import {Box, CardContent, Typography, IconButton, CircularProgress} from '@mui/material';
 import {Favorite, FavoriteBorder} from '@mui/icons-material';
 import {StyledGridBox} from 'src/mui-styled-components/styledGridBox';
 import {StyledCard} from 'src/mui-styled-components/styledCard';
@@ -13,9 +13,10 @@ interface BookDashboardProps {
   books: Book[];
   likedBooks: number[];
   setLikedBooks: React.Dispatch<SetStateAction<number[]>>;
+  isLoading: boolean;
 }
 
-const BookDashboard: React.FC<BookDashboardProps> = ({books, likedBooks, setLikedBooks}) => {
+const BookDashboard: React.FC<BookDashboardProps> = ({books, likedBooks, setLikedBooks, isLoading}) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const role = localStorage.getItem('userRole');
@@ -27,6 +28,14 @@ const BookDashboard: React.FC<BookDashboardProps> = ({books, likedBooks, setLike
   const handleLikeToggle = (bookId: number) => {
     setLikedBooks((prevLikedBooks) => (prevLikedBooks.includes(bookId) ? prevLikedBooks.filter((id) => id !== bookId) : [...prevLikedBooks, bookId]));
   };
+
+  if (isLoading) {
+    return (
+      <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+        <CircularProgress size={50} />
+      </Box>
+    );
+  }
 
   return (
     <StyledMainContentBox className="custom-scrollbar">
