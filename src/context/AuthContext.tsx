@@ -21,7 +21,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const savedUser = localStorage.getItem('user');
     const savedRole = localStorage.getItem('userRole');
     if (savedUser && savedRole) {
-      console.log(savedUser, savedRole);
       setUser(savedUser);
       setRole(savedRole);
     }

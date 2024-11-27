@@ -104,9 +104,10 @@ const BookDetails: React.FC = () => {
 
   const handleBorrow = async () => {
     const numberBookId = parseInt(bookId || '');
+    const librarianId = parseInt(userId || '');
 
-    if (numberBookId && selectedReader) {
-      await addBorrow(selectedReader, numberBookId);
+    if (numberBookId && selectedReader && librarianId) {
+      await addBorrow(selectedReader, numberBookId, librarianId);
       fetchBookDetails();
     }
   };
@@ -131,7 +132,7 @@ const BookDetails: React.FC = () => {
 
   return (
     <Box sx={{display: 'flex', flexDirection: 'row', padding: '1.5rem', height: '100%', width: '100%'}}>
-      <Box component="img" src="https://picsum.photos/400/600?random=1" alt="Book Cover" sx={{objectFit: 'cover', height: '100%', borderRadius: 2}} />
+      <Box component="img" src={book?.imageURL} alt="Book Cover" sx={{objectFit: 'cover', height: '100%', borderRadius: 2, maxWidth: '30%'}} />
       <Box sx={{flex: 2, ml: 4, mt: 4, display: 'flex', flexDirection: 'column'}}>
         <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', mb: 4}}>
           <Box sx={{width: '70%'}}>
@@ -142,7 +143,7 @@ const BookDetails: React.FC = () => {
             <Grid container spacing={3}>
               {[
                 {label: 'Genre', value: book?.genre},
-                {label: 'Language', value: 'English'},
+                {label: 'Language', value: book?.language},
                 {label: 'Year', value: book?.publishedDate ? new Date(book?.publishedDate).getUTCFullYear() : ''},
                 {label: 'ISBN', value: book?.isbn}
               ].map((attr, index) => (
@@ -221,13 +222,7 @@ const BookDetails: React.FC = () => {
             Description
           </Typography>
           <Typography variant="body1" sx={{color: theme.palette.secondary.main, lineHeight: 1.5}}>
-            This is a detailed description of the book. It provides an overview of the story, main characters, and themes. This is a detailed
-            description of the book. It provides an overview of the story, main characters, and themes.This is a detailed description of the book. It
-            provides an overview of the story, main characters, and themes.This is a detailed description of the book. It provides an overview of the
-            story, main characters, and themes.This is a detailed description of the book. It provides an overview of the story, main characters, and
-            themes.This is a detailed description of the book. It provides an overview of the story, main characters, and themes.This is a detailed
-            description of the book. It provides an overview of the story, main characters, and themes.This is a detailed description of the book. It
-            provides an overview of the story, main characters, and themes.
+            {book?.description}
           </Typography>
         </Box>
       </Box>

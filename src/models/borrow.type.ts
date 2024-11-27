@@ -5,9 +5,11 @@ export type Borrow = {
   id: number;
   userId: number;
   bookId: number;
+  librarianId: number;
   borrowDate: Date;
   returnDate: Date;
   isReturned: boolean;
-  user?: User;
+  reader?: User;
   book?: Book;
+  librarian?: User;
 };
