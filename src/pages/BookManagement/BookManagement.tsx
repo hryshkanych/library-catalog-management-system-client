@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Box, MenuItem, Typography, useTheme } from '@mui/material';
-import { StyledYellowOutlinedButton } from 'src/mui-styled-components/styledYellowOutlinedButton';
-import { StyledTextField } from 'src/mui-styled-components/styledTextField';
-import { useSnackbar } from 'notistack';
-import { addBook, updateBook, getBookById } from 'src/services/book.service';
-import { Book } from 'src/models/book.type';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getGenres } from 'src/services/book.service';
+import React, {useState, useEffect} from 'react';
+import {Box, MenuItem, Typography, useTheme} from '@mui/material';
+import {StyledYellowOutlinedButton} from 'src/mui-styled-components/styledYellowOutlinedButton';
+import {StyledTextField} from 'src/mui-styled-components/styledTextField';
+import {useSnackbar} from 'notistack';
+import {addBook, updateBook, getBookById} from 'src/services/book.service';
+import {Book} from 'src/models/book.type';
+import {useParams, useNavigate} from 'react-router-dom';
+import {getGenres} from 'src/services/book.service';
 
 interface BookManagementProps {
   books: Book[];
   setBooks: React.Dispatch<React.SetStateAction<Book[]>>;
 }
 
-const BookManagement: React.FC<BookManagementProps> = ({ books, setBooks }) => {
+const BookManagement: React.FC<BookManagementProps> = ({books, setBooks}) => {
   const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
   const navigate = useNavigate();
-  const { bookId } = useParams(); 
+  const {bookId} = useParams();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -28,39 +28,38 @@ const BookManagement: React.FC<BookManagementProps> = ({ books, setBooks }) => {
     genre: '',
     language: '',
     description: '',
-    imageURL: '',
+    imageURL: ''
   });
 
-  const [genres, setGenres] = useState<string[]>([]); 
+  const [genres, setGenres] = useState<string[]>([]);
   const languages = ['English', 'Spanish', 'French'];
 
   useEffect(() => {
     const fetchGenres = async () => {
       try {
-        const genresData = await getGenres();  
-        setGenres(genresData);  
+        const genresData = await getGenres();
+        setGenres(genresData);
       } catch (error) {
-        enqueueSnackbar('Failed to fetch genres!', { variant: 'error' });
+        enqueueSnackbar('Failed to fetch genres!', {variant: 'error'});
       }
     };
     fetchGenres();
-  }, []);  
+  }, []);
 
   useEffect(() => {
     if (bookId) {
       const fetchBookData = async () => {
         try {
           const bookToEdit = await getBookById(Number(bookId));
-          console.log('Book data:', JSON.stringify(bookToEdit, null, 2));
-  
-          const { id, ...bookWithoutId } = bookToEdit; 
+
+          const {id, ...bookWithoutId} = bookToEdit;
           const formattedBookData = {
             ...bookWithoutId,
-            publishedDate: new Date(bookWithoutId.publishedDate).toISOString().split('T')[0], 
+            publishedDate: new Date(bookWithoutId.publishedDate).toISOString().split('T')[0]
           };
           setFormData(formattedBookData);
         } catch (error) {
-          enqueueSnackbar('Failed to fetch book data!', { variant: 'error' });
+          enqueueSnackbar('Failed to fetch book data!', {variant: 'error'});
         }
       };
       fetchBookData();
@@ -68,10 +67,10 @@ const BookManagement: React.FC<BookManagementProps> = ({ books, setBooks }) => {
   }, [bookId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const {name, value} = e.target;
     setFormData({
       ...formData,
-      [name]: name === 'copiesAvailable' ? parseInt(value) || 0 : value,
+      [name]: name === 'copiesAvailable' ? parseInt(value) || 0 : value
     });
   };
 
@@ -80,38 +79,27 @@ const BookManagement: React.FC<BookManagementProps> = ({ books, setBooks }) => {
     try {
       if (bookId) {
         const updatedBook = {
-            ...formData,
-            id: Number(bookId), 
-            publishedDate: new Date(formData.publishedDate), 
-          };
-          
-          const resUpdatedBook = await updateBook(Number(bookId), updatedBook);
-          enqueueSnackbar('Book updated successfully!', { variant: 'success' });
-        
+          ...formData,
+          id: Number(bookId),
+          publishedDate: new Date(formData.publishedDate)
+        };
+
+        const resUpdatedBook = await updateBook(Number(bookId), updatedBook);
+        enqueueSnackbar('Book updated successfully!', {variant: 'success'});
+
         setBooks(books.map((book) => (book.id === resUpdatedBook.id ? resUpdatedBook : book)));
+
+        navigate('/', {replace: true});
       } else {
-        const newBook = { ...formData, publishedDate: new Date(formData.publishedDate) };
-        const resNewBook = await addBook(newBook);  
-        enqueueSnackbar('Book added successfully!', { variant: 'success' });
-        
+        const newBook = {...formData, publishedDate: new Date(formData.publishedDate)};
+        const resNewBook = await addBook(newBook);
+        enqueueSnackbar('Book added successfully!', {variant: 'success'});
+
         setBooks([...books, resNewBook]);
+        navigate('/', {replace: true});
       }
-
-      setFormData({
-        title: '',
-        author: '',
-        publishedDate: '',
-        isbn: '',
-        copiesAvailable: 0,
-        genre: '',
-        language: '',
-        description: '',
-        imageURL: '',
-      });
-
-      navigate('/books');
     } catch (error) {
-      enqueueSnackbar('Failed to submit book data!', { variant: 'error' });
+      enqueueSnackbar('Failed to submit book data!', {variant: 'error'});
     }
   };
 
@@ -121,7 +109,7 @@ const BookManagement: React.FC<BookManagementProps> = ({ books, setBooks }) => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '100%',
+        height: '100%'
       }}
     >
       <Box
@@ -137,33 +125,19 @@ const BookManagement: React.FC<BookManagementProps> = ({ books, setBooks }) => {
           boxShadow: 1,
           borderRadius: 2,
           backgroundColor: theme.palette.primary.light,
-          color: theme.palette.secondary.light,
+          color: theme.palette.secondary.light
         }}
       >
-        <Typography variant="h5" sx={{ textAlign: 'center', marginBottom: '1rem' }}>
+        <Typography variant="h5" sx={{textAlign: 'center', marginBottom: '1rem'}}>
           {bookId ? 'Edit Book' : 'Add New Book'}
         </Typography>
 
-        <Box sx={{ display: 'flex', gap: '1rem' }}>
-          <StyledTextField
-            label="Title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-            sx={{ flex: 1 }}
-          />
-          <StyledTextField
-            label="Author"
-            name="author"
-            value={formData.author}
-            onChange={handleChange}
-            required
-            sx={{ flex: 1 }}
-          />
+        <Box sx={{display: 'flex', gap: '1rem'}}>
+          <StyledTextField label="Title" name="title" value={formData.title} onChange={handleChange} required sx={{flex: 1}} />
+          <StyledTextField label="Author" name="author" value={formData.author} onChange={handleChange} required sx={{flex: 1}} />
         </Box>
 
-        <Box sx={{ display: 'flex', gap: '1rem' }}>
+        <Box sx={{display: 'flex', gap: '1rem'}}>
           <StyledTextField
             label="Published Date"
             name="publishedDate"
@@ -171,22 +145,15 @@ const BookManagement: React.FC<BookManagementProps> = ({ books, setBooks }) => {
             value={formData.publishedDate}
             onChange={handleChange}
             required
-            sx={{ flex: 1 }}
+            sx={{flex: 1}}
             InputLabelProps={{
-              shrink: true,
+              shrink: true
             }}
           />
-          <StyledTextField
-            label="ISBN"
-            name="isbn"
-            value={formData.isbn}
-            onChange={handleChange}
-            required
-            sx={{ flex: 1 }}
-          />
+          <StyledTextField label="ISBN" name="isbn" value={formData.isbn} onChange={handleChange} required sx={{flex: 1}} />
         </Box>
 
-        <Box sx={{ display: 'flex', gap: '1rem' }}>
+        <Box sx={{display: 'flex', gap: '1rem'}}>
           <StyledTextField
             label="Copies Available"
             name="copiesAvailable"
@@ -194,17 +161,9 @@ const BookManagement: React.FC<BookManagementProps> = ({ books, setBooks }) => {
             value={formData.copiesAvailable}
             onChange={handleChange}
             required
-            sx={{ flex: 1 }}
+            sx={{flex: 1}}
           />
-          <StyledTextField
-            label="Genre"
-            name="genre"
-            value={formData.genre}
-            onChange={handleChange}
-            select
-            required
-            sx={{ flex: 1 }}
-          >
+          <StyledTextField label="Genre" name="genre" value={formData.genre} onChange={handleChange} select required sx={{flex: 1}}>
             {genres.map((genre) => (
               <MenuItem key={genre} value={genre}>
                 {genre}
@@ -213,45 +172,20 @@ const BookManagement: React.FC<BookManagementProps> = ({ books, setBooks }) => {
           </StyledTextField>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: '1rem' }}>
-          <StyledTextField
-            label="Language"
-            name="language"
-            value={formData.language}
-            onChange={handleChange}
-            select
-            required
-            sx={{ flex: 1 }}
-          >
+        <Box sx={{display: 'flex', gap: '1rem'}}>
+          <StyledTextField label="Language" name="language" value={formData.language} onChange={handleChange} select required sx={{flex: 1}}>
             {languages.map((language) => (
               <MenuItem key={language} value={language}>
                 {language}
               </MenuItem>
             ))}
           </StyledTextField>
-          <StyledTextField
-            label="Image URL"
-            name="imageURL"
-            value={formData.imageURL}
-            onChange={handleChange}
-            required
-            sx={{ flex: 1 }}
-          />
+          <StyledTextField label="Image URL" name="imageURL" value={formData.imageURL} onChange={handleChange} required sx={{flex: 1}} />
         </Box>
 
-        <StyledTextField
-          label="Description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          multiline
-          rows={3}
-          required
-        />
+        <StyledTextField label="Description" name="description" value={formData.description} onChange={handleChange} multiline rows={3} required />
 
-        <StyledYellowOutlinedButton type="submit">
-          {bookId ? 'Update Book' : 'Add Book'}
-        </StyledYellowOutlinedButton>
+        <StyledYellowOutlinedButton type="submit">{bookId ? 'Update Book' : 'Add Book'}</StyledYellowOutlinedButton>
       </Box>
     </Box>
   );

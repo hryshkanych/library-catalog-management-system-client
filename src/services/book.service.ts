@@ -16,7 +16,6 @@ export const getBooks = async (): Promise<Book[]> => {
 export const getBookById = async (id: number): Promise<Book> => {
   try {
     const response = await axios.get<Book>(API_URL + `/${id}`);
-    console.log('dddd',response.data);
     
     return response.data;
   } catch (error) {

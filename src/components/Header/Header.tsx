@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, IconButton, Avatar, Typography, InputAdornment, Popover, List, ListItem, ListItemIcon, ListItemText, Divider} from '@mui/material';
 import {ExitToApp, Menu, Notifications, Search} from '@mui/icons-material';
 import {StyledTabs, StyledTab} from 'src/mui-styled-components/styledTabs';
@@ -22,6 +22,7 @@ const Header: React.FC<HeaderProps> = ({toggleFilters, onSearch}) => {
   const isRootPath = location.pathname === '/';
   const role = localStorage.getItem('userRole');
   const username = localStorage.getItem('user');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const tabs = [
     {label: 'Library', path: '', roles: ['Admin', 'Reader', 'Librarian']},
@@ -33,11 +34,18 @@ const Header: React.FC<HeaderProps> = ({toggleFilters, onSearch}) => {
 
   const visibleTabs = tabs.filter((tab) => tab.roles.includes(role || ''));
   const [selectedTab, setSelectedTab] = useState(() => {
-    const currentTab = visibleTabs.findIndex((tab) => tab.path === location.pathname);
+    const currentTab = visibleTabs.findIndex((tab) => {
+      return location.pathname === tab.path || (tab.path.length && location.pathname.startsWith(tab.path));
+    });
     return currentTab !== -1 ? currentTab : 0;
   });
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  useEffect(() => {
+    const currentTab = visibleTabs.findIndex((tab) => {
+      return location.pathname === tab.path || (tab.path.length && location.pathname.startsWith(tab.path));
+    });
+    setSelectedTab(currentTab !== -1 ? currentTab : 0);
+  }, [location.pathname, visibleTabs]);
 
   const {logout} = useAuth();
 

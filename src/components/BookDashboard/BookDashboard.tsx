@@ -114,6 +114,7 @@ const BookDashboard: React.FC<BookDashboardProps> = ({books, likedBooks, setLike
                   <Typography
                     variant="body2"
                     sx={{ color: theme.palette.primary.contrastText, cursor: 'pointer', paddingRight: '20px' }}
+                    onClick={() => navigate(`/books/${book.id}`)}
                   >
                     Edit
                   </Typography>

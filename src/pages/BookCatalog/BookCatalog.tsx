@@ -103,6 +103,7 @@ const BookCatalog: React.FC = () => {
             <Route path="/activity" element={<UserHistory />} />
             <Route path="/readers-activity" element={<ReadersActivity />}></Route>
             <Route path="/books" element={<BookManagement books={books} setBooks={setBooks} />} />
+            <Route path="/books/:bookId" element={<BookManagement books={books} setBooks={setBooks} />} />
             <Route path="/reports" element={<AdminReports />}></Route>
           </Routes>
         </div>
