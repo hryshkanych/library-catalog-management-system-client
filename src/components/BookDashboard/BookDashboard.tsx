@@ -1,28 +1,58 @@
-import React, { SetStateAction, useEffect } from 'react';
-import { Box, CardContent, Typography, IconButton } from '@mui/material';
-import { Favorite, FavoriteBorder } from '@mui/icons-material';
-import { StyledGridBox } from 'src/mui-styled-components/styledGridBox';
-import { StyledCard } from 'src/mui-styled-components/styledCard';
-import { StyledMarkedBox } from 'src/mui-styled-components/styledMarkedBox';
-import { useTheme } from '@mui/material/styles';
-import { StyledMainContentBox } from 'src/mui-styled-components/styledMainContentBox';
-import { useNavigate } from 'react-router-dom';
-import { Book } from 'src/models/book.type';
+import React, {SetStateAction, useEffect, useRef, useState} from 'react';
+import {Box, CardContent, Typography, IconButton, CircularProgress, Pagination} from '@mui/material';
+import {Favorite, FavoriteBorder} from '@mui/icons-material';
+import {StyledGridBox} from 'src/mui-styled-components/styledGridBox';
+import {StyledCard} from 'src/mui-styled-components/styledCard';
+import {StyledMarkedBox} from 'src/mui-styled-components/styledMarkedBox';
+import {useTheme} from '@mui/material/styles';
+import {StyledMainContentBox} from 'src/mui-styled-components/styledMainContentBox';
+import {useNavigate} from 'react-router-dom';
+import {Book} from 'src/models/book.type';
+
 
 interface BookDashboardProps {
   books: Book[];
   likedBooks: number[];
   setLikedBooks: React.Dispatch<SetStateAction<number[]>>;
+  isLoading: boolean;
 }
 
-const BookDashboard: React.FC<BookDashboardProps> = ({ books, likedBooks, setLikedBooks }) => {
+const BookDashboard: React.FC<BookDashboardProps> = ({books, likedBooks, setLikedBooks, isLoading}) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const role = localStorage.getItem('userRole');
 
+  const gridRef = useRef<HTMLDivElement>(null);
+  const itemRef = useRef<HTMLDivElement>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [booksPerPage, setBooksPerPage] = useState(12);
+
   useEffect(() => {
     localStorage.setItem('likedBooks', JSON.stringify(likedBooks));
   }, [likedBooks]);
+
+  useEffect(() => {
+    const calculateBooksPerPage = () => {
+      if (gridRef.current && itemRef.current) {
+        const containerWidth = gridRef.current.offsetWidth;
+        const gridItemWidth = itemRef.current.offsetWidth;
+        const columns = Math.floor(containerWidth / gridItemWidth);
+        const rows = 3;
+        setBooksPerPage(columns * rows);
+      }
+    };
+
+    calculateBooksPerPage();
+
+    const resizeObserver = new ResizeObserver(calculateBooksPerPage);
+    if (gridRef.current) {
+      resizeObserver.observe(gridRef.current);
+    }
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  const startIndex = (currentPage - 1) * booksPerPage;
+  const displayedBooks = books.slice(startIndex, startIndex + booksPerPage);
 
   const handleLikeToggle = (bookId: number) => {
     setLikedBooks((prevLikedBooks) => 
@@ -32,11 +62,22 @@ const BookDashboard: React.FC<BookDashboardProps> = ({ books, likedBooks, setLik
     );
   };
 
+  if (isLoading) {
+    return (
+      <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+        <CircularProgress size={50} />
+      </Box>
+    );
+  }
+
   return (
-    <StyledMainContentBox className="custom-scrollbar">
-      <StyledGridBox>
-        {books.map((book, index) => (
-          <StyledCard key={index}>
+    <StyledMainContentBox
+      className="custom-scrollbar"
+      sx={{display: 'flex', justifyContent: 'space-between', flexDirection: 'column', minHeight: 'calc(100vh - 4.5rem)'}}
+    >
+      <StyledGridBox ref={gridRef}>
+        {displayedBooks.map((book, index) => (
+          <StyledCard key={index} ref={index === 0 ? itemRef : null}>
             <img
               src={book.imageURL}
               alt={`Book ${index + 1}`}
@@ -94,6 +135,19 @@ const BookDashboard: React.FC<BookDashboardProps> = ({ books, likedBooks, setLik
           </StyledCard>
         ))}
       </StyledGridBox>
+      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '1rem'}}>
+        <Pagination
+          count={Math.ceil(books.length / booksPerPage)}
+          page={currentPage}
+          onChange={(_, page) => setCurrentPage(page)}
+          color="primary"
+          sx={{
+            '& .MuiPaginationItem-text': {
+              color: theme.palette.secondary.light
+            }
+          }}
+        />
+      </Box>
     </StyledMainContentBox>
   );
 };

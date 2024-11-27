@@ -26,9 +26,9 @@ const Header: React.FC<HeaderProps> = ({toggleFilters, onSearch}) => {
   const tabs = [
     {label: 'Library', path: '', roles: ['Admin', 'Reader', 'Librarian']},
     {label: 'Activity', path: '/activity', roles: ['Reader']},
-    {label: 'Users', path: '/users', roles: ['Librarian']},
     {label: 'Readers Activity', path: '/readers-activity', roles: ['Librarian']},
-    {label: 'Books Management', path: '/books', roles: ['Admin']}
+    {label: 'Books Management', path: '/books', roles: ['Admin']},
+    {label: 'Reports', path: '/reports', roles: ['Admin']}
   ];
 
   const visibleTabs = tabs.filter((tab) => tab.roles.includes(role || ''));

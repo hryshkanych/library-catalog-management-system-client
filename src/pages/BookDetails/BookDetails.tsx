@@ -14,6 +14,7 @@ import {getReaders} from 'src/services/user.service';
 import {StyledAutocomplete} from 'src/mui-styled-components/styledAutocomplete';
 import {addBorrow, getBorrowsByBookId, returnBook} from 'src/services/borrow.service';
 import {Borrow} from 'src/models/borrow.type';
+import {enqueueSnackbar} from 'notistack';
 
 const BookDetails: React.FC = () => {
   const theme = useTheme();
@@ -65,8 +66,8 @@ const BookDetails: React.FC = () => {
           return {
             id: r.id,
             username: r.username,
-            reserve: reservations.map((r) => r.userId).includes(r.id),
-            borrow: borrows.map((b) => b.userId).includes(r.id)
+            reserve: reservations.map((r) => r.readerId).includes(r.id),
+            borrow: borrows.map((b) => b.readerId).includes(r.id)
           };
         });
         setReadersOptions(options);
@@ -83,15 +84,23 @@ const BookDetails: React.FC = () => {
   }, [fetchBookDetails]);
 
   const borrowed = useMemo(() => {
-    return borrowsByBookId.some((b) => b.userId === selectedReader);
+    return borrowsByBookId.some((b) => b.readerId === selectedReader);
   }, [selectedReader, borrowsByBookId]);
 
   const handleReservation = async () => {
     const numberUserId = parseInt(userId || '');
     const numberBookId = parseInt(bookId || '');
     if (numberBookId && numberUserId) {
-      const result = await addReservation(numberUserId, numberBookId);
-      setReserved(!!result);
+      try {
+        const result = await addReservation(numberUserId, numberBookId);
+        setReserved(!!result);
+        setReservationId(result.id);
+        enqueueSnackbar('The reservation was added successfuly', {variant: 'success'});
+      } catch (e: any) {
+        const errorMessage = e.response?.data?.message || 'An unexpected error occurred.';
+        enqueueSnackbar(errorMessage, {variant: 'error'});
+        fetchBookDetails();
+      }
     }
   };
 
@@ -99,6 +108,13 @@ const BookDetails: React.FC = () => {
     if (reservationId) {
       const result = await cancelReservation(reservationId);
       setReserved(!result);
+      setReservationId(undefined);
+
+      if (result) {
+        enqueueSnackbar('The reservation was canceled successfuly', {variant: 'success'});
+      } else {
+        enqueueSnackbar('An unexpected error occurred while canceling reservation.', {variant: 'error'});
+      }
     }
   };
 
@@ -107,17 +123,28 @@ const BookDetails: React.FC = () => {
     const librarianId = parseInt(userId || '');
 
     if (numberBookId && selectedReader && librarianId) {
-      await addBorrow(selectedReader, numberBookId, librarianId);
+      try {
+        await addBorrow(selectedReader, numberBookId, librarianId);
+        enqueueSnackbar('Book borrowed successfully', {variant: 'success'});
+      } catch (error) {
+        console.error('Error borrowing book:', error);
+        enqueueSnackbar('Failed to borrow book', {variant: 'error'});
+      }
       fetchBookDetails();
     }
   };
 
   const handleReturn = async () => {
     const numberBookId = parseInt(bookId || '');
-    const borrow = borrowsByBookId.find((b) => b.bookId === numberBookId && b.userId === selectedReader);
+    const borrow = borrowsByBookId.find((b) => b.bookId === numberBookId && b.readerId === selectedReader);
 
     if (!!borrow) {
-      await returnBook(borrow.id);
+      try {
+        await returnBook(borrow.id);
+        enqueueSnackbar('Book returned successfully.', {variant: 'success'});
+      } catch (error) {
+        enqueueSnackbar('Failed to return book', {variant: 'error'});
+      }
       fetchBookDetails();
     }
   };

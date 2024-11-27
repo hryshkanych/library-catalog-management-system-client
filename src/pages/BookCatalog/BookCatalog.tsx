@@ -10,6 +10,7 @@ import {FilterCategory, Filters} from 'src/types/filterEntities.type';
 import UserHistory from '../UserHistory/UserHistory';
 import ReadersActivity from '../ReadersActivity/ReadersActivity';
 import BookManagement from '../BookManagement/BookManagement';
+import AdminReports from '../AdminReports/AdminReports';
 
 const BookCatalog: React.FC = () => {
   const [isFiltersVisible, setFiltersVisible] = useState<boolean>(true);
@@ -21,6 +22,7 @@ const BookCatalog: React.FC = () => {
     genres: {}
   });
   const [likedBooks, setLikedBooks] = useState<number[]>(JSON.parse(localStorage.getItem('likedBooks') || '[]'));
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const location = useLocation();
 
@@ -63,6 +65,7 @@ const BookCatalog: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       const books = await getBooks();
       const genres = await getGenres();
       setBooks(books);
@@ -77,6 +80,7 @@ const BookCatalog: React.FC = () => {
           {} as Record<string, boolean>
         )
       }));
+      setIsLoading(false);
     };
 
     fetchData();
@@ -91,11 +95,15 @@ const BookCatalog: React.FC = () => {
         {location.pathname === '/' && <SideBar isVisible={isFiltersVisible} filters={filters} handleFilterChange={handleFilterChange} />}
         <div className="flex-grow">
           <Routes>
-            <Route path="/" element={<BookDashboard books={filteredBooks} likedBooks={likedBooks} setLikedBooks={setLikedBooks} />} />
+            <Route
+              path="/"
+              element={<BookDashboard books={filteredBooks} likedBooks={likedBooks} setLikedBooks={setLikedBooks} isLoading={isLoading} />}
+            />
             <Route path="/book/:id" element={<BookDetails />} />
             <Route path="/activity" element={<UserHistory />} />
             <Route path="/readers-activity" element={<ReadersActivity />}></Route>
             <Route path="/books" element={<BookManagement books={books} setBooks={setBooks} />} />
+            <Route path="/reports" element={<AdminReports />}></Route>
           </Routes>
         </div>
       </main>
