@@ -9,6 +9,7 @@ import {getBooks, getGenres} from 'src/services/book.service';
 import {FilterCategory, Filters} from 'src/types/filterEntities.type';
 import UserHistory from '../UserHistory/UserHistory';
 import ReadersActivity from '../ReadersActivity/ReadersActivity';
+import BookManagement from '../BookManagement/BookManagement';
 import AdminReports from '../AdminReports/AdminReports';
 
 const BookCatalog: React.FC = () => {
@@ -101,6 +102,7 @@ const BookCatalog: React.FC = () => {
             <Route path="/book/:id" element={<BookDetails />} />
             <Route path="/activity" element={<UserHistory />} />
             <Route path="/readers-activity" element={<ReadersActivity />}></Route>
+            <Route path="/books" element={<BookManagement books={books} setBooks={setBooks} />} />
             <Route path="/reports" element={<AdminReports />}></Route>
           </Routes>
         </div>
