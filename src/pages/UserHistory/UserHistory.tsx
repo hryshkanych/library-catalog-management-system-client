@@ -66,7 +66,18 @@ const UserHistory: React.FC = () => {
   }
 
   return (
-    <Box sx={{ padding: '1.5rem', width: '100%' }}>
+    <Box
+    className="custom-scrollbar"
+    sx={{
+      color: theme.palette.secondary.light,
+      overflowY: 'auto',
+      maxHeight: 'calc(100vh - 4.5rem)',
+      display: 'flex',
+      alignItems: 'center',
+      flexDirection: 'column',
+      padding: '1.5rem'
+    }}
+    >
       <StyledTableContainer>
         <StyledTable>
           <TableHead>

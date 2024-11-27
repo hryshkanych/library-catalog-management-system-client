@@ -9,6 +9,7 @@ import {getBooks, getGenres} from 'src/services/book.service';
 import {FilterCategory, Filters} from 'src/types/filterEntities.type';
 import UserHistory from '../UserHistory/UserHistory';
 import ReadersActivity from '../ReadersActivity/ReadersActivity';
+import BookManagement from '../BookManagement/BookManagement';
 
 const BookCatalog: React.FC = () => {
   const [isFiltersVisible, setFiltersVisible] = useState<boolean>(true);
@@ -94,6 +95,7 @@ const BookCatalog: React.FC = () => {
             <Route path="/book/:id" element={<BookDetails />} />
             <Route path="/activity" element={<UserHistory />} />
             <Route path="/readers-activity" element={<ReadersActivity />}></Route>
+            <Route path="/books" element={<BookManagement books={books} setBooks={setBooks} />} />
           </Routes>
         </div>
       </main>
