@@ -135,15 +135,7 @@ const Login: React.FC = () => {
           {!!error ? error : ''}
         </Typography>
 
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <StyledYellowOutlinedButton onClick={handleLogin}>Sign in</StyledYellowOutlinedButton>
-        </Box>
+        <StyledYellowOutlinedButton onClick={handleLogin}>Sign in</StyledYellowOutlinedButton>
       </Box>
     </Box>
   );
