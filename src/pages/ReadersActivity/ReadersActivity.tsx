@@ -18,34 +18,42 @@ const ReadersActivity: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const activeBorrows = (await getBorrows()).filter((b) => !b.isReturned);
-      const activeReservations = (await getReservations()).filter((r) => r.isActive);
+      const activeBorrows = await getBorrows();
+      const activeReservations = await getReservations();
 
       const fetchedActions: Action[] = [
         ...activeBorrows.map((b) => ({
           id: b.id,
-          userId: b.userId,
+          readerId: b.readerId,
           bookId: b.bookId,
           startDate: b.borrowDate,
           type: 'borrow' as const,
+          isActive: !b.isReturned,
           user: b.reader,
           book: b.book
         })),
         ...activeReservations.map((r) => ({
           id: r.id,
-          userId: r.userId,
+          readerId: r.readerId,
           bookId: r.bookId,
           startDate: r.reservationDate,
           endDate: r.expirationDate,
           type: 'reservation' as const,
+          isActive: r.isActive,
           user: r.user,
           book: r.book
         }))
       ];
 
-      fetchedActions.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+      const activeActions = fetchedActions.filter((action) => action.isActive);
+      const inactiveActions = fetchedActions.filter((action) => !action.isActive);
 
-      setActions(fetchedActions);
+      activeActions.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+      inactiveActions.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+
+      const sortedActions = [...activeActions, ...inactiveActions];
+
+      setActions(sortedActions);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -61,7 +69,7 @@ const ReadersActivity: React.FC = () => {
     try {
       const librarianId = parseInt(userId || '');
 
-      await addBorrow(action.userId, action.bookId, librarianId);
+      await addBorrow(action.readerId, action.bookId, librarianId);
       enqueueSnackbar(`Book borrowed successfully: "${action.book?.title}" by ${action.user?.username} (${action.user?.email})`, {
         variant: 'success'
       });
@@ -127,7 +135,7 @@ const ReadersActivity: React.FC = () => {
           }}
         >
           <Box>
-            <Typography variant="h6">Action: {action.type}</Typography>
+            <Typography variant="h6">{action.type.toUpperCase()}</Typography>
             <Typography>
               <strong>User:</strong> {action.user?.username} ({action.user?.email})
             </Typography>
@@ -145,12 +153,12 @@ const ReadersActivity: React.FC = () => {
               </Typography>
             )}
           </Box>
-          {action.type === 'reservation' && (
+          {action.type === 'reservation' && action.isActive && (
             <StyledButton onClick={() => handleBorrow(action)} variant="outlined" sx={{minWidth: '15rem'}} startIcon={<ImportContactsIcon />}>
               Borrow the book
             </StyledButton>
           )}
-          {action.type === 'borrow' && (
+          {action.type === 'borrow' && action.isActive && (
             <StyledButton onClick={() => handleReturn(action)} variant="outlined" sx={{minWidth: '15rem'}} startIcon={<ImportContactsIcon />}>
               Return the book
             </StyledButton>

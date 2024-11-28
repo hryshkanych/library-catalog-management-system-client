@@ -13,11 +13,12 @@ import BookManagement from '../BookManagement/BookManagement';
 import AdminReports from '../AdminReports/AdminReports';
 
 const BookCatalog: React.FC = () => {
+  const userRole = localStorage.getItem('userRole');
   const [isFiltersVisible, setFiltersVisible] = useState<boolean>(true);
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
-    availability: {available: false, rented: false, favorite: false},
+    availability: {available: false, rented: false, ...(userRole === 'Reader' ? {favorite: false} : {})},
     languages: {English: false, Spanish: false, French: false},
     genres: {}
   });
