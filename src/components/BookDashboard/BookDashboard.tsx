@@ -36,7 +36,8 @@ const BookDashboard: React.FC<BookDashboardProps> = ({books, likedBooks, setLike
       if (gridRef.current && itemRef.current) {
         const containerWidth = gridRef.current.offsetWidth;
         const gridItemWidth = itemRef.current.offsetWidth;
-        const columns = Math.floor(containerWidth / gridItemWidth);
+        const columns = Math.ceil(containerWidth / gridItemWidth) - 1;
+        
         const rows = 3;
         setBooksPerPage(columns * rows);
       }

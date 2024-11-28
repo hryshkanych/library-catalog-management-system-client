@@ -187,62 +187,61 @@ const BookDetails: React.FC = () => {
               ))}
             </Grid>
           </Box>
-          {userRole === 'Reader' ? (
-            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: '30%'}}>
-              <StyledMarkedBoxSecond bgColor={availability || borrowed ? theme.palette.secondary.dark : theme.palette.error.main}>
-                <Typography variant="body1" sx={{color: theme.palette.secondary.contrastText}}>
-                  {borrowed ? 'Borrowed' : availability ? 'Available' : 'Unavailable'}
-                </Typography>
-              </StyledMarkedBoxSecond>
-              {availability && !borrowed && (
-                <StyledButton
-                  onClick={() => (reserved ? handleCancelReservation() : handleReservation())}
-                  variant="outlined"
-                  startIcon={<ImportContactsIcon sx={{mr: 1}} />}
-                >
-                  {reserved ? 'Cancel reservation' : 'Reserve Book'}
-                </StyledButton>
-              )}
-            </Box>
-          ) : (
-            userRole === 'Librarian' && (
-              <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: '30%'}}>
-                <StyledAutocomplete
-                  options={readersOptions}
-                  onChange={(_, newValue) => {
-                    if (!!newValue && typeof newValue === 'object' && 'id' in newValue) setSelectedReader(newValue.id);
-                  }}
-                  getOptionLabel={(option) => {
-                    if (typeof option !== 'string' && 'reserve' in option) {
-                      return option.reserve ? `${option.username} : reserved` : option.username;
-                    }
-                    return '';
-                  }}
-                  renderOption={(props, option) => (
-                    <li {...props}>
-                      {option.username}
-                      {option.borrow && ': borrowed'}
-                      {option.reserve && ': reserved'}
-                    </li>
-                  )}
-                  renderInput={(params: AutocompleteRenderInputParams) => <TextField {...params} label="Reader" variant="outlined" />}
-                  sx={{width: 300}}
-                />
-
-                {selectedReader && (
+          <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: '30%'}}>
+            <StyledMarkedBoxSecond bgColor={availability || borrowed ? theme.palette.secondary.dark : theme.palette.error.main} sx={{mb: 2}}>
+              <Typography variant="body1" sx={{color: theme.palette.secondary.contrastText}}>
+                {borrowed ? 'Borrowed' : availability ? 'Available' : 'Unavailable'}
+              </Typography>
+            </StyledMarkedBoxSecond>
+            {userRole === 'Reader'
+              ? availability &&
+                !borrowed && (
                   <StyledButton
-                    disabled={!availability}
-                    onClick={() => (borrowed ? handleReturn() : handleBorrow())}
+                    onClick={() => (reserved ? handleCancelReservation() : handleReservation())}
                     variant="outlined"
                     startIcon={<ImportContactsIcon sx={{mr: 1}} />}
-                    sx={{width: 250}}
                   >
-                    {borrowed ? 'Return the book' : 'Borrow the book'}
+                    {reserved ? 'Cancel reservation' : 'Reserve Book'}
                   </StyledButton>
+                )
+              : userRole === 'Librarian' && (
+                  <>
+                    <StyledAutocomplete
+                      options={readersOptions}
+                      onChange={(_, newValue) => {
+                        if (!!newValue && typeof newValue === 'object' && 'id' in newValue) setSelectedReader(newValue.id);
+                      }}
+                      getOptionLabel={(option) => {
+                        if (typeof option !== 'string' && 'reserve' in option) {
+                          return option.reserve ? `${option.username} : reserved` : option.username;
+                        }
+                        return '';
+                      }}
+                      renderOption={(props, option) => (
+                        <li {...props}>
+                          {option.username}
+                          {option.borrow && ': borrowed'}
+                          {option.reserve && ': reserved'}
+                        </li>
+                      )}
+                      renderInput={(params: AutocompleteRenderInputParams) => <TextField {...params} label="Reader" variant="outlined" />}
+                      sx={{width: 300}}
+                    />
+
+                    {selectedReader && (
+                      <StyledButton
+                        disabled={!availability}
+                        onClick={() => (borrowed ? handleReturn() : handleBorrow())}
+                        variant="outlined"
+                        startIcon={<ImportContactsIcon sx={{mr: 1}} />}
+                        sx={{width: 250}}
+                      >
+                        {borrowed ? 'Return the book' : 'Borrow the book'}
+                      </StyledButton>
+                    )}
+                  </>
                 )}
-              </Box>
-            )
-          )}
+          </Box>
         </Box>
         <Box sx={{backgroundColor: theme.palette.primary.light, borderRadius: '1.5rem', padding: 3}}>
           <Typography variant="h5" sx={{color: theme.palette.secondary.light, mb: 1}}>
